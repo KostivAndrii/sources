@@ -1,0 +1,31 @@
+ansible role :
+    
+     install docker
+     install awscli
+
+jenkins plugin http_request
+        credentials aws
+
+install aws 
+config
+[default]
+region = eu-west-3
+
+configS
+[default]
+output = json
+region = eu-north-1
+
+-bash-4.2$ cat credentials
+[default]
+aws_access_key_id = 
+aws_secret_access_key = 
+
+
+
+hostname artifactory
+192.168.237.125 artifactory
+
+hide atifactory credentials into jenkins
+
+
