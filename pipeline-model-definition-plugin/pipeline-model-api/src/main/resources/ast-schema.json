@@ -1,0 +1,591 @@
+{
+  "description": "Schema for Kyoto AST JSON representation",
+  "definitions": {
+    "rawArgument": {
+      "description": "The raw value of an argument, including whether it's a constant",
+      "type": "object",
+      "properties": {
+        "isLiteral": { "type": "boolean" },
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+
+      "required": ["isLiteral", "value"],
+
+      "additionalProperties": false
+
+    },
+    "argumentValue": {
+      "description": "The value for an argument",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/rawArgument"
+        }
+      },
+      "additionalProperties": false
+    },
+    "environmentEntry": {
+      "description": "An entry in the environment",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/environmentValue"
+        }
+      },
+      "additionalProperties": false
+    },
+    "namedArgumentList": {
+      "description": "Name/value argument pairs used as named parameters",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/argumentValue"
+      }
+    },
+    "mapArgumentValue": {
+      "description": "The value for a map argument",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/rawArgument"
+            },
+            {
+              "$ref": "#/definitions/mapArgumentList"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "mapArgumentList": {
+      "description": "Name/value argument pairs used as map entries",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/mapArgumentValue"
+          }
+        ]
+      }
+    },
+    "positionalArgumentList": {
+      "description": "List of values used as positional parameters",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/rawArgument"
+      }
+    },
+    "singleArgument": {
+      "description": "A single value used as a sole unnamed parameter",
+      "$ref": "#/definitions/rawArgument"
+    },
+    "argumentList": {
+      "description": "Parameters for a method or step call",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/namedArgumentList"
+        },
+        {
+          "$ref": "#/definitions/singleArgument"
+        },
+        {
+          "$ref": "#/definitions/positionalArgumentList"
+        }
+      ]
+    },
+    "argumentMap": {
+      "description": "A map value that may contain further maps",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/"
+        }
+      ]
+    },
+    "keyAndValueOrMethodCall": {
+      "description": "A key/value pair that can either have a value or method call",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/valueOrMethodCall"
+        }
+      },
+      "additionalProperties": false
+    },
+    "methodCall": {
+      "description": "A method call with arguments, outside steps",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/methodArg"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "internalFunction": {
+      "description": "An internal function call",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/singleArgument"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "valueOrMethodCall": {
+      "description": "Either a value or a method call",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/singleArgument"
+        },
+        {
+          "$ref": "#/definitions/methodCall"
+        }
+      ]
+    },
+    "methodArg": {
+      "description": "A possible argument for a method",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/valueOrMethodCall"
+        },
+        {
+          "$ref": "#/definitions/keyAndValueOrMethodCall"
+        }
+      ]
+    },
+    "libraries": {
+      "description": "One or more shared library identifiers to load",
+      "properties": {
+        "libraries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/rawArgument"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "environmentValue": {
+      "description": "A possible value for an environment variable",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/singleArgument"
+        },
+        {
+          "$ref": "#/definitions/internalFunction"
+        }
+      ]
+    },
+    "options": {
+      "description": "One or more options (including job properties, wrappers, and options specific to Declarative Pipelines)",
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/methodCall"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "triggers": {
+      "description": "One or more triggers",
+      "type": "object",
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/methodCall"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "parameters": {
+      "description": "One or more parameter definitions",
+      "type": "object",
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/methodCall"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "step": {
+      "description": "A single step with parameters",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "arguments": {
+          "$ref": "#/definitions/argumentList"
+        }
+      },
+      "required": [
+        "name",
+        "arguments"
+      ],
+      "additionalProperties": false
+    },
+    "treeStep": {
+      "description": "A block-scoped step with parameters containing 1 or more other steps",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "arguments": {
+          "$ref": "#/definitions/argumentList"
+        },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/step"
+              },
+              {
+                "$ref": "#/definitions/treeStep"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "arguments",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "nestedWhenCondition": {
+      "description": "A when condition holding one or more other when conditions",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/step"
+              },
+              {
+                "$ref": "#/definitions/nestedWhenCondition"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "branch": {
+      "description": "A block of steps, generally one of: the contents of a stage, the contents of a build condition block, or one branch of a parallel invocation",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/step"
+              },
+              {
+                "$ref": "#/definitions/treeStep"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "steps"
+      ],
+      "additionalProperties": false
+    },
+    "buildCondition": {
+      "description": "A block of steps to be invoked depending on whether the given build condition is met",
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "string"
+        },
+        "branch": {
+          "$ref": "#/definitions/branch"
+        }
+      },
+      "required": [
+        "condition",
+        "branch"
+      ],
+      "additionalProperties": false
+    },
+    "environment": {
+      "description": "A block of key = value pairs, used to set environment variables for the build",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/environmentEntry"
+      },
+      "minItems": 1
+    },
+    "tools": {
+      "description": "A block of 'toolType \"toolVersion\"' pairs listing tools to autoinstall and add to the path",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/argumentValue"
+      },
+      "minItems": 1
+    },
+    "agent": {
+      "description": "Determines the node/image in which the build will run from either named parameters or a bare none",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "arguments": {
+          "$ref": "#/definitions/mapArgumentList"
+        },
+        "argument": {
+          "$ref": "#/definitions/rawArgument"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "when": {
+      "description": "Conditions to evaluate whether the stage should run or not",
+      "type": "object",
+      "properties": {
+        "beforeAgent": {
+          "type": "boolean"
+        },
+        "beforeInput": {
+          "type": "boolean"
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/step"
+              },
+              {
+                "$ref": "#/definitions/nestedWhenCondition"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "conditions"
+      ],
+      "additionalProperties": false
+    },
+    "post": {
+      "description": "An array of build conditions with blocks of steps to run if those conditions are satisfied at the end of the build while still on the image/node the build ran on",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/buildCondition"
+          }
+        }
+      },
+      "required": [
+        "conditions"
+      ],
+      "additionalProperties": false
+    },
+    "input": {
+      "description": "An input prompt for a stage",
+      "type": "object",
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/rawArgument"
+        },
+        "id": {
+          "$ref": "#/definitions/rawArgument"
+        },
+        "ok": {
+          "$ref": "#/definitions/rawArgument"
+        },
+        "submitter": {
+          "$ref": "#/definitions/rawArgument"
+        },
+        "submitterParameter": {
+          "$ref": "#/definitions/rawArgument"
+        },
+        "parameters": {
+          "$ref": "#/definitions/parameters"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "stage": {
+      "description": "A single Pipeline stage, with a name and either one or more branches or one or more nested stages",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "failFast": {
+          "type": "boolean"
+        },
+        "agent": {
+          "$ref": "#/definitions/agent"
+        },
+        "when": {
+          "$ref": "#/definitions/when"
+        },
+        "post": {
+          "$ref": "#/definitions/post"
+        },
+        "tools": {
+          "$ref": "#/definitions/tools"
+        },
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "options": {
+          "$ref": "#/definitions/options"
+        },
+        "input": {
+          "$ref": "#/definitions/input"
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/branch"
+          }
+        },
+        "parallel": {
+          "$ref": "#/definitions/stages"
+        },
+        "stages": {
+          "$ref": "#/definitions/stages"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "stages": {
+      "description": "Top level section containing a list of stages",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/stage"
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "properties": {
+        "stages": {
+          "$ref": "#/definitions/stages"
+        },
+        "post": {
+          "$ref": "#/definitions/post"
+        },
+        "environment": {
+          "$ref": "#/definitions/environment"
+        },
+        "agent": {
+          "$ref": "#/definitions/agent"
+        },
+        "tools": {
+          "$ref": "#/definitions/tools"
+        },
+        "options": {
+          "$ref": "#/definitions/options"
+        },
+        "triggers": {
+          "$ref": "#/definitions/triggers"
+        },
+        "parameters": {
+          "$ref": "#/definitions/parameters"
+        },
+        "libraries": {
+          "$ref": "#/definitions/libraries"
+        }
+      },
+      "required": [
+        "stages",
+        "agent"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "pipeline": {
+      "$ref": "#/definitions/pipeline"
+    }
+  },
+  "required": [
+    "pipeline"
+  ],
+  "additionalProperties": false
+}

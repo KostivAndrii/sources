@@ -1,0 +1,34 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps": [      {
+        "name": "sh",
+        "arguments": [        {
+          "key": "script",
+          "value":           {
+            "isLiteral": true,
+            "value": "echo ONAGENT=$ONAGENT"
+          }
+        }]
+      }]
+    }]
+  }],
+  "agent":   [
+        {
+      "key": "label",
+      "value":       {
+        "isLiteral": true,
+        "value": "some-label"
+      }
+    },
+        {
+      "key": "otherField",
+      "value":       {
+        "isLiteral": true,
+        "value": "banana"
+      }
+    }
+  ]
+}}

@@ -1,0 +1,65 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps":       [
+                {
+          "name": "writeFile",
+          "arguments":           [
+                        {
+              "key": "text",
+              "value":               {
+                "isLiteral": true,
+                "value": "hello world"
+              }
+            },
+                        {
+              "key": "file",
+              "value":               {
+                "isLiteral": true,
+                "value": "msg.out"
+              }
+            }
+          ]
+        },
+                {
+          "name": "archiveArtifacts",
+          "arguments":           [
+                        {
+              "key": "allowEmptyArchive",
+              "value":               {
+                "isLiteral": true,
+                "value": true
+              }
+            },
+                        {
+              "key": "artifacts",
+              "value":               {
+                "isLiteral": true,
+                "value": "msg.out"
+              }
+            }
+          ]
+        },
+        {
+          "name": "script",
+          "arguments": [        {
+            "key": "scriptBlock",
+            "value":           {
+              "isLiteral": true,
+              "value": "if (isUnix()) {\n                        sh('echo ONAGENT=$ONAGENT')\n                    } else {\n                        bat('echo ONAGENT=%ONAGENT%')\n                    }"
+            }
+          }]
+        }
+      ]
+    }]
+  }],
+  "agent":   {
+    "type": "label",
+    "argument":     {
+      "isLiteral": true,
+      "value": "some-label"
+    }
+  }
+}}

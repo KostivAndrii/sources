@@ -1,0 +1,7 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": []
+  }],
+  "agent": {"type": "none"}
+}}

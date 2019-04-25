@@ -1,0 +1,23 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps": [      {
+        "name": "timeout",
+        "arguments": [],
+        "children": [        {
+          "name": "echo",
+          "arguments": [          {
+            "key": "message",
+            "value":             {
+              "isLiteral": true,
+              "value": "hello"
+            }
+          }]
+        }]
+      }]
+    }]
+  }],
+  "agent": {"type": "none"}
+}}

@@ -1,0 +1,18 @@
+{"pipeline": {
+  "stages": [  {
+    "branches": [    {
+      "name": "default",
+      "steps": [      {
+        "name": "echo",
+        "arguments": [          {
+          "key": "message",
+          "value":             {
+            "isLiteral": true,
+            "value": "hello"
+          }
+        }]
+      }]
+    }]
+  }],
+  "agent": {"type": "none"}
+}}

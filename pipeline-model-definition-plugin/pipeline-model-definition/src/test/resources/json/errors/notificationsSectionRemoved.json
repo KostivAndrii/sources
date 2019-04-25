@@ -1,0 +1,69 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps": [      {
+        "name": "echo",
+        "arguments": [          {
+          "key": "message",
+          "value":             {
+            "isLiteral": true,
+            "value": "hello"
+          }
+        }]
+      }]
+    }]
+  }],
+  "notifications": {"conditions":   [
+        {
+      "condition": "success",
+      "branch":       {
+        "name": "default",
+        "steps": [        {
+          "name": "echo",
+          "arguments": [          {
+            "key": "message",
+            "value":             {
+              "isLiteral": true,
+              "value": "I HAVE DEFINITELY FINISHED"
+            }
+          }]
+        }]
+      }
+    },
+        {
+      "condition": "failure",
+      "branch":       {
+        "name": "default",
+        "steps": [        {
+          "name": "echo",
+          "arguments": [          {
+            "key": "message",
+            "value":             {
+              "isLiteral": true,
+              "value": "I HAVE FAILED"
+            }
+          }]
+        }]
+      }
+    },
+    {
+      "condition": "always",
+      "branch":     {
+        "name": "default",
+        "steps": [      {
+          "name": "echo",
+          "arguments": [          {
+            "key": "message",
+            "value":             {
+              "isLiteral": true,
+              "value": "I HAVE FINISHED"
+            }
+          }]
+        }]
+      }
+    }
+  ]},
+  "agent": {"type": "none"}
+}}

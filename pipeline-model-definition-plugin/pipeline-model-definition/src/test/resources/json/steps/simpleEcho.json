@@ -1,0 +1,10 @@
+{
+  "name": "echo",
+  "arguments": [          {
+    "key": "message",
+    "value":             {
+      "isLiteral": true,
+      "value": "hello"
+    }
+  }]
+}

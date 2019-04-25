@@ -1,0 +1,53 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps":       [
+        {
+          "name": "echo",
+          "arguments": [          {
+            "key": "message",
+            "value":             {
+              "isLiteral": false,
+              "value": "\"FOO is $FOO\""
+            }
+          }]
+        },
+        {
+          "name": "echo",
+          "arguments": [          {
+            "key": "message",
+            "value":             {
+              "isLiteral": false,
+              "value": "\"_UNDERSCORE is $_UNDERSCORE\""
+            }
+          }]
+        }
+      ]
+    }]
+  }],
+  "environment":   [
+    {
+      "key": "FOO",
+      "value":       {
+        "isLiteral": true,
+        "value": "BAR"
+      }
+    },
+    {
+      "key": "_UNDERSCORE",
+      "value":       {
+        "isLiteral": true,
+        "value": "VALID"
+      }
+    }
+  ],
+  "agent":   {
+    "type": "label",
+    "argument":     {
+      "isLiteral": true,
+      "value": "some-label"
+    }
+  }
+}}

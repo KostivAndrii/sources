@@ -1,0 +1,19 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps": [      {
+        "name": "script",
+        "arguments": [        {
+          "key": "scriptBlock",
+          "value":           {
+            "isLiteral": true,
+            "value": "if (isUnix()) {\n                        sh('echo \"THIS WORKS\"')\n                    } else {\n                        bat('echo \"THIS WORKS\"')\n                    }"
+          }
+        }]
+      }]
+    }]
+  }],
+  "agent": {"type": "any"}
+}}

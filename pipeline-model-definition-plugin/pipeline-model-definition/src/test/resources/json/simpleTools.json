@@ -1,0 +1,32 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps": [      {
+        "name": "script",
+        "arguments": [        {
+          "key": "scriptBlock",
+          "value":           {
+            "isLiteral": true,
+            "value": "if (isUnix()) {\n                        sh 'mvn --version'\n                    } else {\n                        bat 'mvn --version'\n                    }"
+          }
+        }]
+      }]
+    }]
+  }],
+  "agent":   {
+    "type": "label",
+    "argument":     {
+      "isLiteral": true,
+      "value": "some-label"
+    }
+  },
+  "tools": [  {
+    "key": "maven",
+    "value":     {
+      "isLiteral": true,
+      "value": "apache-maven-3.0.1"
+    }
+  }]
+}}

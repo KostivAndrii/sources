@@ -1,0 +1,40 @@
+{"pipeline": {
+  "stages": [  {
+    "name": "foo",
+    "branches": [    {
+      "name": "default",
+      "steps":       [
+                {
+          "name": "echo",
+          "arguments": [          {
+            "key": "message",
+            "value":             {
+              "isLiteral": true,
+              "value": "hello"
+            }
+          }]
+        },
+                {
+          "name": "parallel",
+          "arguments":           [
+                        {
+              "key": "a",
+              "value":               {
+                "isLiteral": false,
+                "value": "${{\n                    echo '1'\n                }}"
+              }
+            },
+                        {
+              "key": "b",
+              "value":               {
+                "isLiteral": false,
+                "value": "${{\n                        echo '2'\n                    }}"
+              }
+            }
+          ]
+        }
+      ]
+    }]
+  }],
+  "agent": {"type": "none"}
+}}

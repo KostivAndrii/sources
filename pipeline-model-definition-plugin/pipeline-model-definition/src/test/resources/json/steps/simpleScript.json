@@ -1,0 +1,11 @@
+{
+  "name": "script",
+  "arguments": [{
+      "key": "scriptBlock",
+      "value": {
+        "isLiteral": true,
+        "value": "echo \"In a script step\""
+      }
+    }
+  ]
+}
