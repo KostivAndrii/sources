@@ -1,0 +1,22 @@
+---
+# tasks file for mysql
+- name: install python mysql
+  apt: name=python-mysqldb state=present
+- name: Install mysql server
+  apt: name=mysql-server state=present
+- name: Start and enable mysql server
+  service: name=mysql state=started  enabled=yes
+- name: make sure mysql listens from all the hosts
+  lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp='^bind-address' line='bind-address=0.0.0.0'
+  notify: restart mysql
+- name: create mysql db
+  mysql_db: name={{db_name}} state=present
+- name: create mysql admin user
+  mysql_user: name={{admin_user}} password={{admin_pwd}} priv='*.*:ALL' state=present
+
+- name: create mysql user
+  mysql_user: name={{normal_user}} password={{normal_user_pwd}} priv='demo-dev.*:ALL' state=present
+- name: copy sql file to remote
+  copy: src=mysql.sql dest=/tmp/mysql.sql
+- name: create tables
+  mysql_db: name={{db_name}} state=import target=/tmp/mysql.sql

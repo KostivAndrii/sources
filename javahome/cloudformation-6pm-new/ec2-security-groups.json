@@ -1,0 +1,259 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Metadata": {},
+  "Parameters": {
+    "VpcCidr": {
+      "Description": "Choose Cidr for VPC",
+      "Type": "String",
+      "Default": "10.20.0.0/16"
+    },
+    "PublicSubnet1Cidr": {
+      "Description": "Choose Cidr for PublicSubnet1",
+      "Type": "String",
+      "Default": "10.20.1.0/24"
+    },
+    "PublicSubnet2Cidr": {
+      "Description": "Choose Cidr for PublicSubnet2",
+      "Type": "String",
+      "Default": "10.20.2.0/24"
+    },
+    "PublicSubnet1Az": {
+      "Description": "Choose Az for PublicSubnet1",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "PublicSubnet2Az": {
+      "Description": "Choose Az for PublicSubnet2",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "InstanceKeyName": {
+      "Description": "Choose Your private key",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "InstanceAMIId": {
+      "Description": "Choose AMI for Instance",
+      "Type": "String",
+      "Default": "ami-76d6f519"
+    },
+    "InstanceTypeParameter": {
+      "Type": "String",
+      "Default": "t2.micro",
+      "AllowedValues": [
+        "t2.micro",
+        "m1.small",
+        "m1.large"
+      ],
+      "Description": "Enter t2.micro, m1.small, or m1.large. Default is t2.micro."
+    }
+  },
+  "Mappings": {},
+  "Conditions": {},
+  "Resources": {
+    "JobAssistVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Ref": "VpcCidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "JobAssistVpc"
+          },
+          {
+            "Key": "Batch",
+            "Value": "6PM"
+          }
+        ]
+      }
+    },
+    "PublicSubnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "PublicSubnet1Az"
+        },
+        "MapPublicIpOnLaunch": true,
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "CidrBlock": {
+          "Ref": "PublicSubnet1Cidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PublicSubnet1"
+          }
+        ]
+      }
+    },
+    "PublicSubnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "PublicSubnet2Az"
+        },
+        "MapPublicIpOnLaunch": true,
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "CidrBlock": {
+          "Ref": "PublicSubnet2Cidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PublicSubnet2"
+          }
+        ]
+      }
+    },
+    "JobAssistIGW": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "JobAssistIGW"
+          }
+        ]
+      }
+    },
+    "AttachGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "InternetGatewayId": {
+          "Ref": "JobAssistIGW"
+        }
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PublicRouteTable"
+          }
+        ]
+      }
+    },
+    "IGWRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "JobAssistIGW"
+        }
+      }
+    },
+    "PublicSubnet1Association": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet1"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "PublicSubnet2Association": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet2"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "Instance1": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet1"
+        },
+        "KeyName": {
+          "Ref": "InstanceKeyName"
+        },
+        "ImageId": {
+          "Ref": "InstanceAMIId"
+        },
+        "InstanceType": {
+          "Ref": "InstanceTypeParameter"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "WebServersSG"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Instance1"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex",
+                "-"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "WebServersSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupName": "WebServersSG",
+        "GroupDescription": "Allow Http from Anywhere and SSH from MyIP",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "183.82.18.188/32"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "WebServersSG"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {}
+}

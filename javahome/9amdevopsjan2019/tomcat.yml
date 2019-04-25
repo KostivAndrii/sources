@@ -1,0 +1,39 @@
+---
+- hosts: webservers
+  become: True
+  tasks:
+    - name: Install tomcat
+      yum:
+        name: tomcat
+        state: present
+    - name: Install Git
+      yum:
+        name: git
+        state: present
+    - name: Start tomcat
+      service:
+        name: tomcat
+        state: started
+    - name: Enable tomcat on reboot
+      service:
+        name: tomcat
+        enabled: yes
+    - name: create directory under tomcat webapps
+      file:
+        path: /usr/share/tomcat/webapps/ROOT
+        state: directory 
+    - name: Take website from git and deploy 
+      git:
+        repo: https://github.com/javahometech/javahome-app 
+        dest: /usr/share/tomcat/webapps/ROOT/
+    - name: Update port number of tomcat
+      template:
+        src: server.xml.j2
+        dest: /usr/share/tomcat/conf/server.xml
+      notify:
+        - Restart tomcat
+  handlers:  
+    - name: Restart tomcat
+      service:
+        name: tomcat
+        state: restarted

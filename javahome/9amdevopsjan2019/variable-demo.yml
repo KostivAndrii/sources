@@ -1,0 +1,8 @@
+---
+- hosts: all
+  vars_files:
+    - app-vars.yml
+    - vars2.yml
+  tasks:
+    - debug:
+        msg: "tomcat_port is {{tomcat_port}} and user {{tomcat_user}} {{appname}}"

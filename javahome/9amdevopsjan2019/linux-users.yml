@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install required packages
+      user:
+        name: "{{item.name}}"
+        group: "{{item.group}}"
+      loop:
+        - {name: hari,group: root}
+        - {name: sitha, group: tomcat}
+        - {name: rama, group: root}

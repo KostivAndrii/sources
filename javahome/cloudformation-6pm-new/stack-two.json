@@ -1,0 +1,27 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Metadata": {},
+  "Parameters": {},
+  "Mappings": {},
+  "Conditions": {},
+  "Resources": {
+    "MyAppInstance1": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-76d6f519",
+        "InstanceType": "t2.micro",
+        "SubnetId": {
+          "Fn::ImportValue": "Stack1SubnetId"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyAppInstance1"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {}
+}

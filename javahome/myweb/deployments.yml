@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywebdeployment
+  labels:
+    app: myweb
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: myweb
+  template:
+    metadata:
+      labels:
+        app: myweb
+    spec:
+      containers:
+      - name: myweb
+        image: kammana/myweb:"$(version)"
+        ports:
+        - containerPort: 8080

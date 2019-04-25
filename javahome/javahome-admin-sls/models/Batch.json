@@ -1,0 +1,30 @@
+{
+  "type" : "object",
+  "properties" : {
+    "year" : {
+      "type" : "string"
+    },
+    "time_stamp" : {
+      "type" : "string"
+    },
+    "batches" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "statrt_data" : {
+            "type" : "string"
+          },
+          "regular_weekend" : {
+            "type" : "string"
+          },
+          "course" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  },
+  "title" : "JavaHomeBatch",
+  "description" : "Training Batch Details"
+}

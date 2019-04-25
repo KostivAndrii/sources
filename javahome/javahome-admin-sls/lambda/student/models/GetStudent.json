@@ -1,0 +1,24 @@
+{
+  "type" : "object",
+  "properties" : {
+    "search_fields" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "courses" : {
+            "type" : "array"
+          },
+          "mobile" : {
+            "type" : "string"
+          },
+          "prefferd_timings" : {
+            "type" : "array"
+          }
+        }
+      }
+    }
+  },
+  "title" : "JavaHomeGetStudent",
+  "description" : "A JavaHomeGetStudent for JavaHome Application"
+}

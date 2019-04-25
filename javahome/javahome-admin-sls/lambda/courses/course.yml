@@ -1,0 +1,66 @@
+addcourse:
+  handler: lambda/courses/add_course.add
+  versionFunctions: false
+  name: JHAddCourses
+  package:
+    include:
+      - lambda/courses/add_course.py
+  environment:
+    TABLE_NAME: ${self:custom.courseTable}
+  events:
+    - http:
+        method: post
+        path: courses
+        integration: lambda
+        request:
+          template:
+            application/json: ''
+        response:
+          headers:
+            Content-Type: "'application/json'"
+          template: $input.path('$')
+          statusCodes:
+              200:
+                  pattern: '' # Default response method
+                  template: ${file(templates/200.jsonx)}
+              500:
+                  pattern: '.*"statusCode":.*500.*' # JSON response
+                  template: ${file(templates/500.jsonx)}
+                  headers:
+                    Content-Type: "'application/json'"
+  tags:
+    App: JHAdmin
+    Location: Banglore
+getcours:
+  handler: lambda/courses/get_course.add
+  versionFunctions: false
+  name: JHGetCourse
+  package:
+    include:
+      - lambda/courses/get_course.py
+  environment:
+    TABLE_NAME: ${self:custom.courseTable}
+  events:
+    - http:
+        method: get
+        path: courses
+        integration: lambda
+        request:
+          template:
+            application/json: ''
+        response:
+          headers:
+            Content-Type: "'application/json'"
+          template: $input.path('$')
+          statusCodes:
+              200:
+                  pattern: '' # Default response method
+                  template: ${file(templates/200.jsonx)}
+              500:
+                  pattern: '.*"statusCode":.*500.*' # JSON response
+                  template: ${file(templates/500.jsonx)}
+                  headers:
+                    Content-Type: "'application/json'"
+  tags:
+    App: JHAdmin
+    Location: Banglore

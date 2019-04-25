@@ -1,0 +1,48 @@
+---
+  Resources:
+    javahomestudents:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.studentsTable}
+        AttributeDefinitions:
+          - AttributeName: year
+            AttributeType: S
+          - AttributeName: time_stamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: year
+            KeyType: HASH
+          - AttributeName: time_stamp
+            KeyType: RANGE
+        # Set the capacity based on the stage
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    javahomebatch:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.batchTable}
+        AttributeDefinitions:
+          - AttributeName: start_date
+            AttributeType: S
+        KeySchema:
+          - AttributeName: start_date
+            KeyType: HASH
+        # Set the capacity based on the stage
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    javahomecourseContent:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.courseTable}
+        AttributeDefinitions:
+          - AttributeName: course_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: course_id
+            KeyType: HASH
+        # Set the capacity based on the stage
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5

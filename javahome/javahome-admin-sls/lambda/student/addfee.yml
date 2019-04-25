@@ -1,0 +1,36 @@
+addfee:
+  handler: lambda/student/add_fee.add
+  versionFunctions: false
+  name: JHadminAddFee
+  package:
+    include:
+      - lambda/student/add_fee.py
+  environment:
+    TABLE_NAME: ${self:custom.studentsTable}
+  events:
+    - http:
+        method: post
+        path: addfee
+        integration: lambda
+        reqValidatorName: onlyBody
+        requestModels:
+          "application/json": "JavaHomeFee"
+        request:
+          template:
+            application/json: ''
+        response:
+          headers:
+            Content-Type: "'application/json'"
+          template: $input.path('$')
+          statusCodes:
+              200:
+                  pattern: '' # Default response method
+                  template: ${file(templates/200.jsonx)}
+              500:
+                  pattern: '.*"statusCode":.*500.*' # JSON response
+                  template: ${file(templates/500.jsonx)}
+                  headers:
+                    Content-Type: "'application/json'"
+  tags:
+    App: JHAdmin
+    Location: Banglore

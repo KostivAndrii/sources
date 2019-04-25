@@ -1,0 +1,5 @@
+---
+    - debug:
+        msg: "This is task-1 from tasks1"
+    - debug:
+        msg: "This is task-2 from tasks1"

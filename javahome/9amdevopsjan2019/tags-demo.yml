@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - debug:
+        msg: "This is task-1"
+      tags:
+        - a
+    - debug:
+        msg: "This is task-2"
+      tags:
+        - b
+    - debug:
+        msg: "This is task-3"
+      tags:
+        - c

@@ -1,0 +1,19 @@
+{
+  "Id": "Policy1552529867237",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1552529865902",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::javahome-elb-acceslogs/elb-logs/AWSLogs/962103112291/*",
+      "Principal": {
+        "AWS": [
+          "718504428378"
+        ]
+      }
+    }
+  ]
+}

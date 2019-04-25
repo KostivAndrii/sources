@@ -1,0 +1,422 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Metadata": {},
+  "Parameters": {
+    "WebServerPort": {
+      "Description": "Choose Port for EC2 Instance",
+      "Type": "String",
+      "Default": "80"
+    },
+    "VpcCidr": {
+      "Description": "Choose Cidr for VPC",
+      "Type": "String",
+      "Default": "10.20.0.0/16"
+    },
+    "PublicSubnet1Cidr": {
+      "Description": "Choose Cidr for PublicSubnet1",
+      "Type": "String",
+      "Default": "10.20.1.0/24"
+    },
+    "PublicSubnet2Cidr": {
+      "Description": "Choose Cidr for PublicSubnet2",
+      "Type": "String",
+      "Default": "10.20.2.0/24"
+    },
+    "PublicSubnet1Az": {
+      "Description": "Choose Az for PublicSubnet1",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "PublicSubnet2Az": {
+      "Description": "Choose Az for PublicSubnet2",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "InstanceKeyName": {
+      "Description": "Choose Your private key",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "InstanceTypeParameter": {
+      "Type": "String",
+      "Default": "t2.micro",
+      "AllowedValues": [
+        "t2.micro",
+        "m1.small",
+        "m1.large"
+      ],
+      "Description": "Enter t2.micro, m1.small, or m1.large. Default is t2.micro."
+    },
+    "stackenv": {
+      "Description": "Choose Environment",
+      "Type": "String",
+      "AllowedValues": [
+        "dev",
+        "stg",
+        "prod"
+      ],
+      "Default": "dev"
+    }
+  },
+  "Mappings": {
+    "RegionMap": {
+      "us-east-1": {
+        "64": "ami-14c5486b"
+      },
+      "us-west-1": {
+        "64": "ami-25110f45"
+      },
+      "ap-south-1": {
+        "64": "ami-76d6f519"
+      }
+    }
+  },
+  "Conditions": {
+    "ProdEnvironment": {
+      "Fn::Equals": [
+        "prod",
+        {
+          "Ref": "stackenv"
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "JobAssistVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Ref": "VpcCidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "JobAssistVpc"
+          },
+          {
+            "Key": "Batch",
+            "Value": "6PM"
+          }
+        ]
+      }
+    },
+    "PublicSubnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "PublicSubnet1Az"
+        },
+        "MapPublicIpOnLaunch": true,
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "CidrBlock": {
+          "Ref": "PublicSubnet1Cidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PublicSubnet1"
+          }
+        ]
+      }
+    },
+    "PublicSubnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "PublicSubnet2Az"
+        },
+        "MapPublicIpOnLaunch": true,
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "CidrBlock": {
+          "Ref": "PublicSubnet2Cidr"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PublicSubnet2"
+          }
+        ]
+      }
+    },
+    "JobAssistIGW": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "JobAssistIGW"
+          }
+        ]
+      }
+    },
+    "AttachGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "InternetGatewayId": {
+          "Ref": "JobAssistIGW"
+        }
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PublicRouteTable"
+          }
+        ]
+      }
+    },
+    "IGWRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "JobAssistIGW"
+        }
+      }
+    },
+    "PublicSubnet1Association": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet1"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "PublicSubnet2Association": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet2"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "Instance1": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet1"
+        },
+        "KeyName": {
+          "Ref": "InstanceKeyName"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "RegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "64"
+          ]
+        },
+        "InstanceType": {
+          "Ref": "InstanceTypeParameter"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "WebServersSG"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Instance1"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex \n",
+                "yum install httpd -y \n",
+                "echo 'Welcome to CloudFormation' > /var/www/html/index.html \n",
+                "service httpd start \n",
+                "chkconfig httpd on \n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "Instance2": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnet2"
+        },
+        "KeyName": {
+          "Ref": "InstanceKeyName"
+        },
+        "ImageId": {
+          "Fn::FindInMap": [
+            "RegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "64"
+          ]
+        },
+        "InstanceType": {
+          "Ref": "InstanceTypeParameter"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "WebServersSG"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Instance2"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -ex \n",
+                "yum install httpd -y \n",
+                "echo 'Welcome to CloudFormation Instance-2' > /var/www/html/index.html \n",
+                "service httpd start \n",
+                "chkconfig httpd on \n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "WebServersSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupName": "WebServersSG",
+        "GroupDescription": "Allow Http from Anywhere and SSH from MyIP",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "183.82.18.188/32"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "VpcId": {
+          "Ref": "JobAssistVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "WebServersSG"
+          }
+        ]
+      }
+    },
+    "ElasticLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Condition": "ProdEnvironment",
+      "Properties": {
+        "Subnets": [
+          {
+            "Ref": "PublicSubnet1"
+          },
+          {
+            "Ref": "PublicSubnet2"
+          }
+        ],
+        "Instances": [
+          {
+            "Ref": "Instance1"
+          },
+          {
+            "Ref": "Instance2"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": {
+              "Ref": "WebServerPort"
+            },
+            "Protocol": "HTTP"
+          }
+        ],
+        "HealthCheck": {
+          "Target": {
+            "Fn::Join": [
+              "",
+              [
+                "HTTP:",
+                {
+                  "Ref": "WebServerPort"
+                },
+                "/index.html"
+              ]
+            ]
+          },
+          "HealthyThreshold": "2",
+          "UnhealthyThreshold": "2",
+          "Interval": "10",
+          "Timeout": "2"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ElbDnsName": {
+      "Condition": "ProdEnvironment",
+      "Value": {
+        "Fn::GetAtt": [
+          "ElasticLoadBalancer",
+          "DNSName"
+        ]
+      }
+    },
+    "PublicIpInstance1": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Instance1",
+          "PublicIp"
+        ]
+      }
+    },
+    "PublicIpInstance2": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Instance2",
+          "PublicIp"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Entered the build phase...
+      - echo Build started on `date`
+      - mvn clean package -DskipTests=true
+  post_build:
+    commands:
+      - echo Build completed successfully
+      - mv target/myweb*.war target/myweb.war
+artifacts:
+  files:
+    - target/myweb*/*
+  discard-paths: yes
+
+cache:
+  paths:
+    - '/root/.m2/**/*'

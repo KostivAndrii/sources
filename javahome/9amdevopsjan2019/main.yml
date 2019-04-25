@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: False
+  tasks:
+    - debug:
+        msg: "This is in main playbook"
+    - name: include tasks1
+      include: tasks1.yml
+

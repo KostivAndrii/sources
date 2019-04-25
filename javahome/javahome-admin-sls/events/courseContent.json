@@ -1,0 +1,31 @@
+{
+  "course_id": "devops-training-banglore",
+  "course_img": "aws.png",
+  "course_name": "Amazon Web Services",
+  "course_short_name": "AWS",
+  "mode": "Online & Classroom Training",
+  "course_fee": "15000",
+  "instructor_details": "Hari Kammana",
+  "course_objective": "Need to take care",
+  "reviews": [
+    "5",
+    "4.5",
+    "5"
+  ],
+  "types": [
+    "Admin",
+    "Developer",
+    "Architect"
+  ],
+  "course_content": [
+    {
+      "Introduction to AWS": "This module covers, what is cloud computing, different types of cloud computing,\n    cloud offerings( IaaS, PaaS, SaaS), different job role in cloud, cloud opportunities"
+    },
+    {
+      "Networking VPC": "You will learn, What is networking, designing VPC, CIDR, subnets, securing VPC using\nNACL, Security Groups"
+    },
+    {
+      "Elastic Cloud Compute - EC2": "Introduction to EC2"
+    }
+  ]
+}

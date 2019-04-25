@@ -1,0 +1,33 @@
+course:
+  handler: lambda/course/courses.meta_info
+  versionFunctions: false
+  name: JHCourses
+  package:
+    include:
+      - lambda/course/courses.py
+  environment:
+    TABLE_NAME: javahome_courses
+  events:
+    - http:
+        method: get
+        path: courses/meta
+        integration: lambda
+        request:
+          template:
+            application/json: ''
+        response:
+          headers:
+            Content-Type: "'application/json'"
+          template: $input.path('$')
+          statusCodes:
+              200:
+                  pattern: '' # Default response method
+                  template: ${file(templates/200.jsonx)}
+              500:
+                  pattern: '.*"statusCode":.*500.*' # JSON response
+                  template: ${file(templates/500.jsonx)}
+                  headers:
+                    Content-Type: "'application/json'"
+  tags:
+    App: JHAdmin
+    Location: Banglore

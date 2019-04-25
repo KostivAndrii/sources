@@ -1,0 +1,47 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Metadata": {},
+  "Parameters": {},
+  "Mappings": {},
+  "Conditions": {},
+  "Resources": {
+    "MyAppVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.20.0.0/16",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "MyAppVpc"
+          }
+        ]
+      }
+    },
+    "Subnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": "ap-south-1a",
+        "VpcId": {
+          "Ref": "MyAppVpc"
+        },
+        "CidrBlock": "10.20.1.0/24",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Subnet1"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "SubnetId": {
+      "Description": "Information about the SubnetId",
+      "Value": { "Ref": "Subnet1" },
+      "Export": {
+        "Name": "Stack1SubnetId"
+      }
+    }
+  }
+}

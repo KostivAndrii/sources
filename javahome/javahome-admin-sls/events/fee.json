@@ -1,0 +1,11 @@
+{
+  "year": "2018",
+  "time_stamp": "29-Nov-2018 12:26:42:793914",
+  "total_fee": 20000,
+  "next_due_date": "1-1-2019",
+  "payments": [
+    {
+      "paid_amount": 1234
+    }
+  ]
+}

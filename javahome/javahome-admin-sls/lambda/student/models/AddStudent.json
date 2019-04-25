@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "required": [
+    "country_code",
+    "courses",
+    "mobile",
+    "name"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "mobile": {
+      "type": "string"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "courses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "preferred_timings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "title": "JavaHomeAddStudent",
+  "description": "A JavaHomeAddStudent for JavaHome Application"
+}

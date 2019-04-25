@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: True
+  tasks:
+    - name: Install on Linux
+      yum:
+        name: git
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Install on Ubuntu
+      apt:
+        name: git
+        state: present
+      when: 
+        - ansible_os_family == "Debian"
+        - ansible_os_version == "6"

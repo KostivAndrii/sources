@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: "This is task-1 from common playbook"
+    - debug:
+        msg: "This is task-2 from common playbook"

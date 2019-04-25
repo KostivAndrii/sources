@@ -1,0 +1,37 @@
+batch:
+  handler: lambda/batch/add_batch.add
+  versionFunctions: false
+  name: JHadminAddBatch
+  package:
+    individually: true
+    include:
+      - lambda/batch/add_batch.py
+  environment:
+    TABLE_NAME: ${self:custom.batchTable}
+  events:
+    - http:
+        method: post
+        path: batch
+        integration: lambda
+        reqValidatorName: onlyBody
+        requestModels:
+          "application/json": "JavaHomeBatch"
+        request:
+          template:
+            application/json: ''
+        response:
+          headers:
+            Content-Type: "'application/json'"
+          template: $input.path('$')
+          statusCodes:
+              200:
+                  pattern: '' # Default response method
+                  template: ${file(templates/200.jsonx)}
+              500:
+                  pattern: '.*"statusCode":.*500.*' # JSON response
+                  template: ${file(templates/500.jsonx)}
+                  headers:
+                    Content-Type: "'application/json'"
+  tags:
+    App: JHAdmin
+    Location: Banglore

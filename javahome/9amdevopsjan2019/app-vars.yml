@@ -1,0 +1,10 @@
+tomcat_port: 8080
+tomcat_user: admin
+packages:
+  - git
+  - docker
+  - tomcat
+  - open-jdk7
+db_id: javahome
+db_pwd: Admin&&^%123
+api_token: AAJA4A5D5R5R5R5R5R5R55RR55

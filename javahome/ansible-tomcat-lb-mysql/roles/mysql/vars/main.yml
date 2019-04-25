@@ -1,0 +1,9 @@
+---
+# vars file for mysql
+
+db_name: javahomedb
+admin_user: admin
+admin_pwd: Admin@1234
+normal_user: hari
+normal_user_pwd: Hari123
+

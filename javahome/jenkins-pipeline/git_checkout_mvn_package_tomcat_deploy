@@ -1,0 +1,42 @@
+node{
+  stage('SCM Checkout'){
+  // Behind the scenes it calls git groovy function with our arguments
+   git credentialsId: 'github', 
+       url: 'https://github.com/javahometech/my-app',
+       branch: 'master'
+  }
+  stage('Maven Package'){
+    def mvnHome = tool name: 'maven3', type: 'maven'
+    def mvn = "${mvnHome}/bin/mvn"
+    sh "${mvn} clean package"
+  }
+  stage('Deploy-to-Dev'){
+    // rename warfile
+    sh 'mv target/myweb*.war target/myweb.war'
+   
+    sshagent(['tomcat-dev']) {
+         def tomcatIp='172.31.14.149'
+         def tomcatUsr='ec2-user'
+         def stopTomcat = "${tomcatUsr}@${tomcatIp} /opt/tomcat8/bin/shutdown.sh"
+         def startTomcat = "${tomcatUsr}@${tomcatIp} /opt/tomcat8/bin/startup.sh"
+         def webApps = "/opt/tomcat8/webapps/"
+         try{
+			 // stop tomcat server
+				sh "ssh -o strictHostKeyChecking=no  ${stopTomcat}"
+		 }catch(e){
+		 
+		 }
+         try{
+			// remove old war on tomcat
+			sh "ssh ec2-user@${tomcatIp} rm /opt/tomcat8/webapp/myweb*"
+		 }catch(e){
+		 
+		 }
+         // copy new war to tomcat
+         sh "scp target/myweb.war ${tomcatUsr}@${tomcatIp}:${webApps}"
+         // start tomcat
+         sh "ssh ${startTomcat}"
+    }
+    
+  }
+}

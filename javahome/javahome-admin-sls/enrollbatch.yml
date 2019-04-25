@@ -1,0 +1,36 @@
+enrollbatch:
+  handler: enrollbatch/enrollbatch.add
+  versionFunctions: false
+  name: JHadminEnrollBatch
+  package:
+    include:
+      - enrollbatch/enrollbatch.py
+  environment:
+    TABLE_NAME: javahome_students
+  events:
+    - http:
+        method: post
+        path: enrollbatch
+        integration: lambda
+        reqValidatorName: onlyBody
+        #requestModels:
+        #  "application/json": "JavaHomeenrollbatch"
+        request:
+          template:
+            application/json: ''
+        response:
+          headers:
+            Content-Type: "'application/json'"
+          template: $input.path('$')
+          statusCodes:
+              200:
+                  pattern: '' # Default response method
+                  template: ${file(templates/200.jsonx)}
+              500:
+                  pattern: '.*"statusCode":.*500.*' # JSON response
+                  template: ${file(templates/500.jsonx)}
+                  headers:
+                    Content-Type: "'application/json'"
+  tags:
+    App: JHAdmin
+    Location: Banglore
