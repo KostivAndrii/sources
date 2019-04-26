@@ -1,0 +1,60 @@
+import groovy.json.JsonSlurper
+
+def getBuildVersion() {
+    final API_KEY = 'AKCp5ccGXKgp571DUjg7FfjTru6n8DyEygjrGCkV5JHgjwBYYnzsyRPFuu8g5v244TdnoXbS4'
+//    final API_KEY = 'AKCp5ccGT2x3evLXvGmtUTVnUq3toYqx4SR3ZeVrdvTdkY4T56V8edN6kEnNJjvNkhWTf7nn4'
+
+    def response = httpRequest customHeaders: [[name: 'X-JFrog-Art-Api', value: "${API_KEY}"],[name: 'content-type', value: 'text/plain']], httpMode: 'POST', requestBody: 'items.find({"repo":{"$match":"libs-*-local"},"path":{"$match":"com/geekcap/vmturbo/hello-world-servlet-example/*"},"name":{"$match":"*.war"}}).include("repo","name","path")', responseHandle: 'LEAVE_OPEN', url: 'http://artifactory:8081/artifactory/api/search/aql'
+    def json = new JsonSlurper().parseText(response.content).results.name
+    json.add("latest-RELEASE")
+    json.add("latest-SNAPSHOT")
+    return json
+}
+
+/*pipeline {
+    agent any
+    parameters {
+        choice(choices: json, description: 'Choise artifact', name: 'release')
+//      choice(choices: getBuildVersion(), description: 'Choise artifact', name: 'release')
+        choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do a dry run to grab parameters?
+    } 
+*/
+
+/*    triggers {
+              pollSCM '* * * * *'
+    }*/
+
+pipeline {
+    agent any
+    stages {
+        stage("Gather Deployment Parameters") {
+            steps {
+                timeout(time: 120, unit: 'SECONDS') {
+                    script {
+                        // Show the select input modal
+                       def INPUT_PARAMS = input message: 'Please select build number', ok: 'Deploy',
+                                        parameters: [choice(name: 'BUILD_NAME', choices: getBuildVersion(), description: 'Available App WAR image'),
+                                                     choice(name: 'DRY_RUN', choices:"Yes\nNo", description: "Do a dry run to grab parameters?" )]
+                        echo "*${INPUT_PARAMS.DRY_RUN}*"
+                        echo "before assign *${env.DRY_RUN}*"
+                        env.BUILD_NAME = INPUT_PARAMS.BUILD_NAME
+/*                        env.DRY_RUN = params.release */
+                        env.DRY_RUN = INPUT_PARAMS.DRY_RUN
+                        echo "after assign *${env.DRY_RUN}*"
+                    }
+                }
+            }
+        }
+        stage("Use Deployment Parameters") {
+//  work onli when env.DRY_RUN set Yes
+            when { expression { return env.DRY_RUN != 'Yes' } }             
+                steps {
+                    script {
+                        echo "All parameters have been set as Environment Variables"
+                        echo "Selected Environment: ${env.DRY_RUN}"
+                        echo "Selected Tag: ${env.BUILD_NAME}"
+                    }
+                }
+        }
+    }
+}
