@@ -16,7 +16,7 @@ def getBuildVersion() {
     parameters {
         choice(choices: json, description: 'Choise artifact', name: 'release')
 //      choice(choices: getBuildVersion(), description: 'Choise artifact', name: 'release')
-        choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do a dry run to grab parameters?
+        choice(name: 'DRY_RUN', choices:"Yes\nNo", description: 'Do a dry run to grab parameters?')
     } 
 */
 
