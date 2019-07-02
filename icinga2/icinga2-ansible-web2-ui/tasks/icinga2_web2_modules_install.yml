@@ -1,0 +1,8 @@
+---
+- name: Download modules from github
+  git:
+    repo: "https://github.com/Icinga/icingaweb2-module-{{ item }}.git"
+    dest: "{{ modules_dir }}/{{ item}}"
+    update: no
+  loop: "{{ modules_list }}"
+  ignore_errors: yes

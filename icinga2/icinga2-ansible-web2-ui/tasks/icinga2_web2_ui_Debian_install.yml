@@ -1,0 +1,85 @@
+---
+- name: Install Mysql prerequisite
+  apt:
+    name: python-mysqldb
+
+- name: Install PHP requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - php
+    - php-gd
+    - libapache2-mod-php
+
+- name: Get PHP version
+  command: php --version
+  register: php_version
+  changed_when: false
+
+- name: Set PHP version
+  set_fact:
+    php_version: "{{ php_version.stdout_lines[0] | regex_replace('^PHP (\\d\\.\\d).*$','\\1') }}"
+
+- name: Enable PHP apache module
+  apache2_module:
+    name: "php{{ php_version }}"
+
+- name: Find out timezone
+  slurp:
+     src: /etc/timezone
+  register: etc_timezone
+
+- name: Timezone in php.ini
+  lineinfile:
+    path: '/etc/php/{{ php_version }}/apache2/php.ini'
+    regexp: '^;?date.timezone ='
+    line: 'date.timezone = "{{ etc_timezone["content"] | b64decode | regex_replace("\n") }}"'
+  notify: restart apache2
+
+- name: Install Icinga Web2 on Debian family
+  apt:
+    name: "{{ icinga2_web2_ui_deb }}"
+    state: latest
+  tags: icinga2-ansible-web2-ui-install
+
+- name: Install the Icinga2 IDO module
+  package:
+    name: icinga2-ido-mysql
+    state: present
+
+- import_tasks: icinga2_web2_create_databases.yml
+
+- name: Restart HTTPD and Icinga2 to Apply the Configuration
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop:
+    - apache2
+    - icinga2
+
+- name: Add user www-data to group icingaweb2
+  user:
+    name: www-data
+    groups: icingaweb2
+
+- name: Adjust Directory Owner and Group
+  file:
+    path: "/etc/icingaweb2/modules"
+    owner: www-data
+    group: icingaweb2
+    mode: 0755
+    state: directory
+    recurse: yes
+
+- name: Create Directory Owner and Group
+  file:
+    path: "/etc/icingaweb2/modules/{{ item }}"
+    owner: www-data
+    group: icingaweb2
+    mode: 0755
+    state: directory
+  loop:
+    - monitoring
+    - translation

@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+
+allowed_hosts={{ allowed_hosts | default('nrpe_allowed_hosts') }}
+
+{{ nrpe_configuration }}
+
+{% if ansible_os_family == 'RedHat' %}
+nrpe_user=nrpe
+nrpe_group=nrpe
+{% endif %}
+{% if ansible_os_family == 'Debian' or ansible_os_family == 'Gentoo' %}
+nrpe_user=nagios
+nrpe_group=nagios
+{% endif %}
+
+{{ nrpe_check_commands }}
