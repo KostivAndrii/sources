@@ -1,0 +1,52 @@
+- name: install selinux-related python binaries for Ansible to work
+  yum: name={{ item }} state=present
+  with_items:
+    - checkpolicy
+    - policycoreutils
+    - libselinux-python
+    - policycoreutils-python
+
+# FIXME: fails with
+# fatal: [centos]: FAILED! => {"changed": false, "failed": true, "msg": "KeyError: 'all files'\n"}
+#
+#- name: set correct context for mailserver data dir
+#  sefcontext:
+#    target: "{{ mailserver_data_dir }}(/.*)?"
+#    setype: mail_spool_t
+#    state: present
+
+- name: set correct context for mailserver data dir
+  shell: "semanage fcontext -a -t mail_spool_t \"{{ mailserver_data_dir }}(/.*)?\""
+
+- name: restore context for mailserver data dir
+  shell: "restorecon -R \"{{ mailserver_data_dir }}\""
+
+# from https://github.com/pabelanger/ansible-role-semodule/blob/master/tasks/config.yaml
+# ASL2
+- name: Copy type enforcement files.
+  copy:
+    dest: "{{ semodule_dest }}"
+    src: "{{ item }}"
+  register: results
+  with_items: "{{ mailserver_semodule_te }}"
+
+- name: checkmodule
+  shell: "checkmodule -M -m -o {{ item.item|basename|replace('.te', '.mod') }} {{ item.item|basename }}"
+  args:
+    chdir: "{{ semodule_dest }}"
+  when: "{{ item.changed }}"
+  with_items: "{{ results.results }}"
+
+- name: semodule_package
+  shell: "semodule_package -o {{ item.item|basename|replace('.te', '.pp') }} -m {{ item.item|basename|replace('.te', '.mod') }}"
+  args:
+    chdir: "{{ semodule_dest }}"
+  when: "{{ item.changed }}"
+  with_items: "{{ results.results }}"
+
+- name: semodule
+  shell: "semodule -i {{ item.item|basename|replace('.te', '.pp') }}"
+  args:
+    chdir: "{{ semodule_dest }}"
+  when: "{{ item.changed }}"
+  with_items: "{{ results.results }}"

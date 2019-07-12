@@ -1,0 +1,171 @@
+<?php
+#{{ ansible_managed }}
+
+$_DEBUG = {{ mediawiki_debug|lower }};
+
+if ( $_DEBUG ) {
+error_reporting(E_ALL | E_STRICT);
+ini_set("display_errors", 1);
+}
+
+
+# Protect against web entry
+if ( !defined( 'MEDIAWIKI' ) ) {
+        exit;
+}
+
+$IP = '{{ mediawiki_install_path }}';
+
+require_once( $IP . "/Keys.php" );
+
+## Uncomment this to disable output compression
+# $wgDisableOutputCompression = true;
+
+$wgSitename = "{{ mediawiki_site_name }}";
+$wgMetaNamespace = "{{ mediawiki_meta_namespace }}";
+
+$wgScriptPath = "{{ mediawiki_script_path }}";
+$wgArticlePath = "{{ mediawiki_article_path }}";
+$wgScriptExtension = ".php";
+
+## The protocol and server name to use in fully-qualified URLs
+$wgServer = "{{ mediawiki_base_url }}";
+
+## The relative URL path to the skins directory
+$wgStylePath = "$wgScriptPath/skins";
+
+## The relative URL path to the logo.  Make sure you change this from the default,
+## or else you'll overwrite your logo when you upgrade!
+if ( file_exists ( "$wgScriptPath/{{ mediawiki_logo_path }}" ) ) {
+  $wgLogo = "$wgScriptPath/{{ mediawiki_logo_path }}";
+} else {
+  $wgLogo = "$wgScriptPath/resources/assets/wiki.png";
+}
+if ( file_exists ( "$wgScriptPath/{{ mediawiki_favicon_path }}" ) ) {
+  $wgFavicon = "$wgScriptPath/{{ mediawiki_favicon_path }}";
+}
+
+## UPO means: this is also a user preference option
+
+$wgEnableEmail =        true;
+$wgEnableUserEmail =    true; # UPO
+
+$wgEmergencyContact =  "{{ mediawiki_emergency_contact }}";
+$wgPasswordSender =    "{{ mediawiki_password_sender }}";
+
+$wgEnotifUserTalk      = true; # UPO
+$wgEnotifWatchlist     = true; # UPO
+$wgEmailAuthentication = true;
+$wgEmailConfirmToEdit  = true;
+
+## Database settings
+$wgDBtype              = "{{ mediawiki_db_type }}";
+$wgDBserver            = "{{ mediawiki_db_server }}";
+$wgDBname              = "{{ mediawiki_db_database }}";
+$wgDBuser              = "{{ mediawiki_db_username }}";
+$wgDBpassword          = "{{ mediawiki_db_password }}";
+
+# Postgres specific
+$wgDBPort              = "5432";
+$wgDBmwschema          = "mediawiki";
+
+## Shared memory settings
+$wgMainCacheType       = {{ mediawiki_cache_type }};
+$wgMemCachedServers    = {{ mediawiki_cache_memcached_servers }};
+{% if mediawiki_cache_memcached_sessions %}
+$wgSessionsInMemcached = true;
+{% endif %}
+
+## Additional caching to memcache
+{% if mediawiki_cache_type == "CACHE_MEMCACHED" %};
+$wgParserCacheType  = CACHE_MEMCACHED;
+$wgMessageCacheType = CACHE_MEMCACHED;
+# Semantic mediawiki
+$smwgCacheType      = CACHE_MEMCACHED;
+$smwgMainCacheType  = CACHE_MEMCACHED;
+{% endif %}
+
+$wgEnableParserCache = true;
+$wgCachePages = true;
+
+# NO DB HITS!
+$wgDisableCounters = true;
+$wgMiserMode = true;
+
+## To enable image uploads, make sure the 'images' directory
+## is writable, then set this to true:
+$wgEnableUploads = true;
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/bin/convert";
+
+# InstantCommons allows wiki to use images from http://commons.wikimedia.org
+$wgUseInstantCommons = false;
+
+## If you use ImageMagick (or any other shell command) on a
+## Linux server, this will need to be set to the name of an
+## available UTF-8 locale
+$wgShellLocale = "en_US.utf8";
+
+## If you want to use image uploads under safe mode,
+## create the directories images/archive, images/thumb and
+## images/temp, and make them all writable. Then uncomment
+## this, if it's not already uncommented:
+#$wgHashedUploadDirectory = false;
+
+## Set $wgCacheDirectory to a writable directory on the web server
+## to make your wiki go slightly faster. The directory should not
+## be publically accessible from the web.
+$wgCacheDirectory = "{{ mediawiki_cache_directory }}";
+
+# Site language code, should be one of the list in ./languages/Names.php
+$wgLanguageCode = "{{ mediawiki_language_code }}";
+
+## For attaching licensing metadata to pages, and displaying an
+## appropriate copyright notice / icon. GNU Free Documentation
+## License and Creative Commons licenses are supported so far.
+$wgRightsPage = "{{ mediawiki_rights_page }}"; # Set to the title of a wiki page that describes your license/copyright
+$wgRightsUrl = "{{ mediawiki_rights_url }}";
+$wgRightsText = "{{ mediawiki_rights_text }}";
+$wgRightsIcon = "{{ mediawiki_rights_icon }}";
+
+$wgDiff = "/usr/bin/diff";
+$wgDiff3 = "/usr/bin/diff3";
+
+# The following permissions were set based on your choice in the installer
+{% for perm in mediawiki_permissions.groups %}
+$wgGroupPermissions['{{ perm.group }}']['{{ perm.permission }}'] = {{ perm.allowed }};
+{% endfor %}
+
+$wgFileExtensions = array_merge( $wgFileExtensions, {{ mediawiki_file_extensions }} );
+
+$wgAllowExternalImages = {{ mediawiki_allow_external_images }};
+
+{% for skin in mediawiki_skins %}
+wfLoadSkin( '{{ skin.name }}' );
+{% endfor %}
+
+$wgDefaultSkin = "{{ mediawiki_default_skin }}";
+
+{% for extension in mediawiki_extensions %}
+wfLoadExtension( '{{ extension.name }}' );
+{% if extension.config is defined %}
+{{ extension.config }}
+{% endif %}
+{% endfor %}
+
+{% for line in mediawiki_custom_lines %}
+{{ line }}
+{% endfor %}
+
+if ( $_DEBUG ) {
+$wgShowExceptionDetails = true;
+$wgShowSQLErrors        = true;
+$wgDebugComments        = true;
+$wgLogQueries           = true;
+$wgDebugDumpSql         = true;
+$wgDevelopmentWarnings  = true;
+$wgDebugProfiling       = true;
+$wgDebugTimestamps      = true;
+$wgResourceLoaderDebug  = true;
+$wgDebugToolbar         = true;
+}

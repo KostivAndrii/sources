@@ -1,0 +1,7 @@
+---
+
+- stat: path=/etc/path
+  register: data_path
+
+- include: initial.yml
+  when: not data_path.stat.exists

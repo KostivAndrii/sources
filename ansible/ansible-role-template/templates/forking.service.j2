@@ -1,0 +1,10 @@
+[Unit]
+Description=pigpiod
+
+[Service]
+ExecStart=/usr/local/bin/pigpiod
+Type=forking
+PIDFile=/var/run/pigpio.pid
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,5 @@
+---
+
+cpupower_enabled: false
+cpupower_enabled_governor: ondemand
+cpupower_disabled_governor: ondemand

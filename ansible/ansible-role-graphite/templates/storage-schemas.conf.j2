@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+
+{% for item in graphite_storage_schemas %}
+[{{ item.name }}]
+pattern = {{ item.pattern }}
+retentions = {{ item.retentions }}
+
+{% endfor %}

@@ -1,0 +1,5 @@
+collectd_graphite: true
+collectd_network: false
+collectd_nfs: false
+collectd_physhw: false
+collectd_apache: false

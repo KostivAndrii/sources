@@ -1,0 +1,3 @@
+journald_system_max_use: 500M
+
+journald_remove_storage: false

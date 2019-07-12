@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Richard Marko <rmarko@base48.cz>
+  description:
+  license: BSD
+  min_ansible_version: 1.9
+  platforms:
+   - name: EL
+     versions:
+      - 7
+   - name: Fedora
+     versions:
+      - 21
+      - 22
+      - 23
+  categories:
+   - system

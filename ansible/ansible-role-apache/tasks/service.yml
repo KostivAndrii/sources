@@ -1,0 +1,6 @@
+---
+
+- name: Enable apache
+  service: name={{ item }} enabled=yes state=started
+  with_items:
+  - httpd

@@ -1,0 +1,37 @@
+Listen {{ moin_ssl_listen }} https
+
+{% for wiki in moin_wikis %}
+<VirtualHost *:{{ moin_ssl_listen }}>
+    ServerName   {{ wiki.vhost }}
+    DocumentRoot {{ moin_data_dir }}/documentroot
+
+    ErrorLog  /var/log/httpd/moin_{{ wiki.name }}_error_log
+    CustomLog /var/log/httpd/moin_{{ wiki.name }}_access_log common
+
+    SSLEngine               on
+    SSLCertificateFile      {{ wiki.ssl_cert }}
+    SSLCertificateKeyFile   {{ wiki.ssl_key }}
+{% if wiki.ssl_chain is defined %}
+    SSLCertificateChainFile {{ wiki.ssl_chain }}
+{% endif %}
+
+    WSGIScriptAlias / /usr/share/moin/server/moin.wsgi
+
+    WSGIDaemonProcess     moin user={{ moin_user }} group={{ moin_group }} home={{ moin_data_dir }} processes=5 threads=10 maximum-requests=1000 umask=0007
+    WSGIProcessGroup      moin
+    WSGIPassAuthorization On
+
+    # Enable HSTS (2 years expiration)
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains;"
+
+    <Directory "/usr/share/moin/server">
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName {{ wiki.vhost }}
+    Redirect   / https://{{ wiki.vhost }}/
+</VirtualHost>
+
+{% endfor %}

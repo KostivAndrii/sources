@@ -1,0 +1,56 @@
+---
+
+- name: install packages
+  yum : name=mailman state=present
+
+- name: /etc/mailman/mm_cfg.py
+  template:
+    src=mm_cfg.py.j2
+    dest=/etc/mailman/mm_cfg.py
+    owner=root group=root mode=0644
+
+- name: /etc/httpd/conf.d/mailman.conf
+  template:
+    src=mailman.conf.j2
+    dest=/etc/httpd/conf.d/mailman.conf
+    owner=root group=root mode=0644
+  notify: reload apache
+
+- name: /etc/httpd/conf.d/lists.conf (vhost)
+  template:
+    src=lists.conf.j2
+    dest=/etc/httpd/conf.d/lists.conf
+    owner=root group=root mode=0644
+  notify: reload apache
+
+- seport:
+    ports: "{{ mailman_ssl_listen }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  when: common_selinux
+
+- name: set site password
+  command: /usr/lib/mailman/bin/mmsitepass {{ mailman_password }}
+  no_log: true
+
+- name: check mailman list existence
+  stat: path=/var/lib/mailman/lists/mailman/
+  register: stat_mailman
+
+- name: create mailman list
+  command: /usr/lib/mailman/bin/newlist -q mailman {{ mailman_admin }} {{ mailman_password }}
+  when: not stat_mailman.stat.exists
+
+- name: generate aliases
+  command: /usr/lib/mailman/bin/genaliases
+  notify: restart postfix
+
+- name: enusre correct owner/rights for /etc/mailman/aliases*
+  file: path={{ item }} mode=660 owner=root group=mailman
+  with_items:
+  - /etc/mailman/aliases
+  - /etc/mailman/aliases.db
+
+- name: enable and start mailman
+  service: name=mailman state=running enabled=yes

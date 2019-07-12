@@ -1,0 +1,36 @@
+---
+#graphite_domain: graphite.example.com
+#graphite_secret_csrf_key: eeLahch5Ahqueih8chuthi9A
+
+# uncomment to enable ssl vhost
+#graphite_ssl_listen: 14446
+
+#graphite_ssl_cert: "/etc/letsencrypt/live/{{ graphite_domain }}/cert.pem"
+#graphite_ssl_key: "/etc/letsencrypt/live/{{ graphite_domain }}/privkey.pem"
+#graphite_ssl_chain: "/etc/letsencrypt/live/{{ graphite_domain }}/chain.pem"
+
+devel_ssl_cert: /etc/pki/tls/certs/localhost.crt
+devel_ssl_key: /etc/pki/tls/private/localhost.key
+
+graphite_ssl_cert: "{{ devel_ssl_cert }}"
+graphite_ssl_key: "{{ devel_ssl_key }}"
+graphite_ssl_chain: "{{ devel_ssl_key }}"
+
+graphite_line_interface: 0.0.0.0
+graphite_line_port: 2003
+graphite_udp_enabled: false
+graphite_udp_interface: 0.0.0.0
+graphite_udp_port: 2003
+graphite_pickle_interface: 0.0.0.0
+graphite_pickle_port: 2004
+graphite_cache_query_interface: 0.0.0.0
+graphite_cache_query_port: 7002
+
+graphite_manage_storage_schemas: true
+graphite_storage_schemas:
+- name: carbon
+  pattern: ^carbon\.
+  retentions: 60:90d
+- name: default_1min_for_1day
+  pattern: .*
+  retentions: 60s:1d

@@ -1,0 +1,8 @@
+# Set-up milter for postfix
+
+# FIXME: need to create separate hash file and include via deps
+#- name: Add the /etc/aliases file
+#  copy: src=aliases dest=/etc/aliases owner=root mode=644
+#  notify:
+#  - restart postfix
+#  - restart pagure_milter

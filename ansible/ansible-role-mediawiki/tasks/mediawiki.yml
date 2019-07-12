@@ -1,0 +1,108 @@
+---
+
+- name: install dependencies
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+   - python-pygments
+   - git
+
+- name: create install dir
+  file:
+    path: "{{ mediawiki_install_path }}"
+    state: directory
+
+- stat: path={{ mediawiki_install_path }}/.git
+  register: mw_git
+
+- name: clone mediawiki repository
+  git:
+    repo: "{{ mediawiki_git_url_base }}{{ mediawiki_git_repo }}"
+    dest: "{{ mediawiki_install_path }}"
+    version: "remotes/origin/{{ mediawiki_release }}"
+  when: not mw_git.stat.exists
+
+- name: get MediaWiki libraries using composer
+  shell: scl-composer-php{{ scl_php_version }} update
+  args:
+    chdir: "{{ mediawiki_install_path }}"
+
+- name: template initialSetup.sh
+  template:
+    src: initialSetup.sh.j2
+    dest: "{{ mediawiki_install_path }}/initialSetup.sh"
+    owner: "{{ mediawiki_user }}"
+    group: "{{ mediawiki_user }}"
+    mode: 0755
+
+- name: create empty wiki and LocalSettings file
+  shell: "./initialSetup.sh"
+  args:
+    chdir: "{{ mediawiki_install_path }}"
+    creates: "{{ mediawiki_install_path }}/LocalSettings.php"
+
+- name: extract keys from generated LocalSettings.php file
+  shell: |
+    echo "<?php" > Keys.php
+    grep "^\$wgSecretKey" LocalSettings.php >> Keys.php
+    grep "^\$wgUpgradeKey" LocalSettings.php >> Keys.php
+    echo "?>" >> Keys.php
+  args:
+    chdir: "{{ mediawiki_install_path }}"
+    creates: "{{ mediawiki_install_path }}/Keys.php"
+
+- name: remove newly created LocalSettings.php
+  file:
+    path={{ mediawiki_install_path }}/LocalSettings.php
+    state=absent
+
+- name: template LocalSettings
+  template:
+    src: LocalSettings.php.j2
+    dest: "{{ mediawiki_install_path }}/LocalSettings.php"
+    owner: "{{ mediawiki_user }}"
+    group: "{{ mediawiki_user }}"
+    mode: 0644
+
+- name: update permissions
+  file:
+    path: "{{ mediawiki_install_path }}/{{ item }}"
+    state: directory
+    recurse: yes
+    owner: "{{ mediawiki_user }}"
+    group: "{{ mediawiki_user }}"
+    mode: 0775
+  with_items:
+    - cache
+    - uploads
+    - images
+
+- name: enable scl php55
+  file:
+    src: "/opt/rh/httpd24/root/etc/httpd/{{ item }}"
+    dest: "/etc/httpd/{{ item }}"
+    state: link
+    force: true
+  with_items:
+    - conf.d/php55-php.conf
+    - conf.modules.d/10-php55-php.conf
+    - modules/libphp55-php5.so
+
+- name: create httpd config dir
+  file:
+    path: "/etc/httpd/conf.d/mediawiki/"
+    state: directory
+
+- name: install httpd config
+  template:
+    src: etc_httpd_conf.d_mediawiki_mediawiki.conf.j2
+    dest: /etc/httpd/conf.d/mediawiki/mediawiki.conf
+  notify:
+   - restart apache
+
+- name: install httpd SSL vhost config
+  template: src=etc_httpd_conf.d_mediawiki-ssl.conf dest=/etc/httpd/conf.d/mediawiki-ssl.conf owner=root group=root mode=644
+  when: mediawiki_ssl_listen is defined
+  notify:
+   - restart apache

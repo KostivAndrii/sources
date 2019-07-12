@@ -1,0 +1,7 @@
+---
+
+letsencrypt_autogenerate: True
+letsencrypt_email: admin@example.org
+letsencrypt_domains:
+  - example.org
+letsencrypt_webroot: /var/www/letsencrypt

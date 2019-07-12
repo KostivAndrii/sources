@@ -1,0 +1,4 @@
+# by default role will only install ecdsa key if available
+# falling back to rsa key if not avail
+ssh_rsa_hostkey: /etc/ssh/ssh_host_rsa_key
+ssh_ecdsa_hostkey: /etc/ssh/ssh_host_ecdsa_key

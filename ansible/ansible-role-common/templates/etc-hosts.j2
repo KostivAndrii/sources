@@ -1,0 +1,8 @@
+#{{ ansible_managed }}
+127.0.0.1   {{ common_hostname_name }} {{ common_hostname_name}}.{{ common_hostname_domain }} localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         {{ common_hostname_name }} {{ common_hostname_name}}.{{ common_hostname_domain }} localhost localhost.localdomain localhost6 localhost6.localdomain6
+{% if common_hosts_add %}
+{% for item in common_hosts_add %}
+{{ item }}
+{% endfor %}
+{% endif %}

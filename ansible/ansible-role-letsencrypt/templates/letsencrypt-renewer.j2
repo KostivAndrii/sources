@@ -1,0 +1,6 @@
+#!/bin/bash
+#{{ ansible_managed }}
+
+
+/usr/bin/letsencrypt renew
+systemctl reload httpd

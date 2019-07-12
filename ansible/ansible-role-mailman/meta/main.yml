@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  author: Richard Marko <rmarko@base48.cz>
+  description:
+  license: BSD
+  min_ansible_version: 1.9
+  platforms:
+   - name: EL
+     versions:
+      - 7
+   - name: Fedora
+     versions:
+      - 21
+      - 22
+      - 23
+  categories:
+   - system
+
+dependencies:
+   - role: nestihacky.apache
+   - role: nestihacky.mailserver
+  # FIXME: these need to be put to group_vars or host_vars as dep resolution is b0rken
+  #    postfix_alias_maps_append: ', hash:/etc/mailman/aliases'
+  #    postfix_local_recipient_maps_append: ', $alias_maps'
+  #    postfix_mydestination_append: ', $mydomain, lists.$mydomain'

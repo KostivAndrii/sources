@@ -1,0 +1,14 @@
+---
+- name: create git group
+  group: name=git
+
+- name: create gitolite3 group
+  group: name=gitolite3
+
+- name: create git user
+  user: name=git group=git groups=gitolite3
+    home={{ git_core_repo }}
+
+- name: create repo path
+  file: name={{ git_core_repo }} state=directory mode=0755
+    owner=git group=git

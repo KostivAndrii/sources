@@ -1,0 +1,6 @@
+---
+
+- include: install.yml
+  when: cpupower_enabled
+- include: conf.yml
+  when: cpupower_enabled

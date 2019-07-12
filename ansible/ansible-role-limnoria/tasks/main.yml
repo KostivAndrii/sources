@@ -1,0 +1,40 @@
+---
+- name: install limnoria package
+  yum:
+    name: limnoria
+    state: present
+
+- name: create bot user
+  user:
+    name: "{{ limnoria_user }}"
+    home: "{{ limnoria_dir }}"
+    state: present
+  when: limnoria_create_user
+
+- name: copy bot configuration
+  unarchive:
+    src: "{{ limnoria_archive }}"
+    dest: "{{ limnoria_dir }}"
+    owner: "{{ limnoria_user }}"
+    creates: "{{ limnoria_config }}"
+  when: limnoria_archive is defined
+
+- name: install plugins from git
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ limnoria_config | dirname }}/plugins/{{ item.name }}"
+  with_items: "{{ limnoria_plugins_git }}"
+
+- name: create systemd unit
+  template:
+    src: limnoria.service.j2
+    dest: /etc/systemd/system/limnoria.service
+  notify: reload systemd
+
+- meta: flush_handlers
+
+- name: enable and start limnoria
+  service:
+    name: limnoria
+    state: started
+    enabled: yes

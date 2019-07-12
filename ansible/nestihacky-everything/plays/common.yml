@@ -1,0 +1,8 @@
+---
+- name: common
+  hosts: all
+  sudo: yes
+  roles:
+  - nestihacky.common
+  - nestihacky.epel
+  - nestihacky.ssh

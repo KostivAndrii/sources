@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+
+user sniproxy
+
+pidfile /var/run/sniproxy.pid
+
+error_log {
+    syslog daemon
+    priority debug
+}
+
+listen 443 {
+    proto tls
+    table https_hosts
+}
+
+table https_hosts {
+{% for item in sniproxy_routes %}
+    {{ item.domain }} {{ item.target }}
+{% endfor %}
+}

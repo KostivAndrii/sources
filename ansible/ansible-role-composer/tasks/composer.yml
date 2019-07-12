@@ -1,0 +1,59 @@
+---
+
+# inspired by https://github.com/OULibraries/ansible-role-sclphp/blob/master/tasks/composer.yml
+
+- name: Add composer user
+  user:
+    name: composer
+    state: present
+
+- name: Ensure /tmp/downloads exists
+  file:
+    path: /tmp/downloads
+    owner: root
+    group: wheel
+    state: directory
+
+- name: Ensure composer temporary install path exists
+  file:
+    path: "{{ composer_temp_install_path }}"
+    owner: composer
+    group: wheel
+    state: directory
+
+- name: Download Composer installer
+  get_url:
+    url: https://getcomposer.org/installer
+    dest: /tmp/downloads/composer-installer.php
+    mode: 0775
+
+- name: Install Composer
+  become: yes
+  become_user: composer
+  shell: >
+    /opt/rh/php{{ composer_php_scl_version }}/root/usr/bin/php /tmp/downloads/composer-installer.php
+  args:
+    chdir: "{{ composer_temp_install_path }}"
+    creates: "{{ composer_temp_install_path }}/composer.phar"
+
+- name: Move composer to install path
+  shell: mv {{ composer_temp_install_path }}/composer.phar {{ composer_install_path }}/composer.phar
+
+- name: Make sure Composer is executable
+  file:
+    path: "{{ composer_install_path }}/composer.phar"
+    owner: composer
+    group: wheel
+    mode: 0775
+
+- name: "Set wrapper file name"
+  set_fact:
+    wrapper_filename: "scl-composer-php{{ composer_php_scl_version }}"
+
+- name: "Make composer wrapper {{ wrapper_filename }}"
+  template:
+    src: wrapper.j2
+    dest: "{{ composer_install_path }}/{{ wrapper_filename }}"
+    owner: composer
+    group: wheel
+    mode: 0755

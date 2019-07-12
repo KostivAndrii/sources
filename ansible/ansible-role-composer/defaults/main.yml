@@ -1,0 +1,8 @@
+---
+
+composer_install: false
+# according to installed SCL PHP version
+# /opt/rh/phpXY/
+composer_php_scl_version: 55
+composer_temp_install_path: /tmp/composer_install
+composer_install_path: /usr/local/bin

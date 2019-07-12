@@ -1,0 +1,41 @@
+---
+
+- name: install packages
+  yum : name=certbot state=present
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 7
+
+# FIXME or not (el6 installation support): we need to install with certbot-auto (into virtualenv, wtf..)
+# https://wiki.shaunc.com/wikka.php?wakka=UsingCertbotAndLetsEncryptOnCentos6
+
+- file: path="{{ letsencrypt_webroot }}" owner=root group=root mode=755 state=directory
+
+- name: install letsencrypt_alias.conf to httpd/conf.d
+  template:
+    src=letsencrypt_alias.conf
+    dest=/etc/httpd/conf.d
+    owner=root group=root mode=0644
+  notify: reload apache
+
+- meta: flush_handlers
+
+- name: generate certs
+  shell: "test -d /etc/letsencrypt/live/{{ item }}/ || letsencrypt certonly --email  {{ letsencrypt_email }} --agree-tos --webroot -w {{ letsencrypt_webroot }} -d {{ item }}"
+  with_items: "{{ letsencrypt_domains }}"
+  notify: reload apache
+  register: result
+  when: letsencrypt_autogenerate
+  changed_when: "result.stdout != ''"
+
+- name: install letsencrypt-renewer to cron.daily
+  template:
+    src=letsencrypt-renewer.j2
+    dest=/etc/cron.daily/letsencrypt-renewer
+    owner=root group=root mode=0755
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 7
+
+- name: install letsencrypt-renewer to cron.daily (el6)
+  template:
+    src=letsencrypt-renewer.el6.j2
+    dest=/etc/cron.daily/letsencrypt-renewer
+    owner=root group=root mode=0755
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 6

@@ -1,0 +1,108 @@
+---
+- name: install moin and dependencies
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+  - moin
+  - mod_wsgi
+
+- name: create moin group
+  group:
+    name: "{{ moin_group }}"
+    state: present
+  when: moin_user_create
+
+- name: create moin user
+  user:
+    name: "{{ moin_user }}"
+    group: "{{ moin_group }}"
+    home: "{{ moin_data_dir }}"
+    shell: /sbin/nologin
+    state: present
+  when: moin_user_create
+
+- name: allow port in selinux
+  seport:
+    ports: "{{ moin_ssl_listen }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  when: common_selinux
+
+- name: set correct context for mailserver data dir
+  command: 'semanage fcontext -a -t httpd_sys_rw_content_t "{{ moin_data_dir }}(/.*)?"'
+  when: common_selinux
+
+- name: restore context for mailserver data dir
+  command: 'restorecon -R "{{ moin_data_dir }}"'
+  when: common_selinux
+
+- name: create data dirs
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ moin_user }}"
+    group: "{{ moin_group }}"
+    mode: 0770
+  with_items:
+  - "{{ moin_data_dir }}"
+  - "{{ moin_data_dir }}/data"
+  - "{{ moin_data_dir }}/underlay"
+  - "{{ moin_data_dir }}/documentroot"
+
+- name: add config dir to moin.wsgi
+  lineinfile:
+    path: /usr/share/moin/server/moin.wsgi
+    regexp: ANSIBLE_ROLE_MOIN
+    line: "sys.path.insert(0, '{{ moin_data_dir }}') # ANSIBLE_ROLE_MOIN"
+  notify: reload apache
+
+- name: create httpd config
+  template:
+    src: moin.conf.j2
+    dest: /etc/httpd/conf.d/moin.conf
+  notify: reload apache
+
+- name: create farmconfig
+  template:
+    src: farmconfig.py.j2
+    dest: "{{ moin_data_dir }}/farmconfig.py"
+  notify: reload apache
+
+- name: create wiki configs
+  template:
+    src: wiki.py.j2
+    dest: "{{ moin_data_dir }}/{{ item.name }}.py"
+  with_items: "{{ moin_wikis }}"
+  notify: reload apache
+
+- name: create data dirs
+  command: cp -r /usr/share/moin/data/ {{ moin_data_dir }}/data/{{ item.name }}
+  args:
+    creates: "{{ moin_data_dir }}/data/{{ item.name }}"
+  with_items: "{{ moin_wikis }}"
+
+- name: fix data dir permissions
+  file:
+    name: "{{ moin_data_dir }}/data/{{ item.name }}"
+    state: directory
+    owner: "{{ moin_user }}"
+    group: "{{ moin_group }}"
+    recurse: yes
+  with_items: "{{ moin_wikis }}"
+
+- name: create underlay dirs
+  command: cp -r /usr/share/moin/underlay/ {{ moin_data_dir }}/underlay/{{ item.name }}
+  args:
+    creates: "{{ moin_data_dir }}/underlay/{{ item.name }}"
+  with_items: "{{ moin_wikis }}"
+
+- name: fix underlay dir permissions
+  file:
+    name: "{{ moin_data_dir }}/underlay/{{ item.name }}"
+    state: directory
+    owner: "{{ moin_user }}"
+    group: "{{ moin_group }}"
+    recurse: yes
+  with_items: "{{ moin_wikis }}"

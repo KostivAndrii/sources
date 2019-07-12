@@ -1,0 +1,30 @@
+- name: Add COPR repository with PostgreSQL enabled opendmarc
+  copy: src=etc_yum.repos.d_mmilata-opendmarc.repo dest=/etc/yum.repos.d/mmilata-opendmarc-epel-7.repo
+  tags:
+    - dependencies
+
+- name: Install OpenDMARC milter and related packages
+  yum: name={{ item }} state=present enablerepo=mmilata-opendmarc
+  with_items:
+      - opendmarc
+  tags:
+    - dependencies
+
+- name: Copy OpenDMARC configuration file into place
+  template: src=etc_opendmarc.conf.j2 dest=/etc/opendmarc.conf owner=root group=root
+  notify: restart opendmarc
+
+- name: Copy OpenDMARC ignore hosts file into place
+  template: src=etc_opendmarc_ignore.hosts.j2 dest=/etc/opendmarc/ignore.hosts owner=root group=root
+
+- name: Copy nightly OpenDMARC report generation script into place
+  template: src=etc_opendmarc_report.sh.j2 dest=/etc/opendmarc/report.sh owner=root group=root mode="755"
+
+- name: Touch initial report dat file with correct permissions
+  file: path=/var/run/opendmarc/opendmarc.dat state=touch owner=opendmarc group=opendmarc
+
+- name: Activate OpenDMARC report cronjob
+  cron: name="OpenDMARC report" hour="2" minute="0" job="/bin/bash /etc/opendmarc/report.sh >> /var/log/opendmarc_report.log"
+
+- name: Enable and start opendmarc
+  service: name=opendmarc state=started enabled=yes

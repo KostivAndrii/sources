@@ -1,0 +1,11 @@
+---
+- include: common.yml
+- include: git.yml
+- include: limnoria.yml
+- include: mailserver.yml
+- include: mailman.yml
+- include: pagure.yml
+- include: sniproxy.yml
+- include: letsencrypt.yml
+- include: graphite.yml
+- include: moin.yml

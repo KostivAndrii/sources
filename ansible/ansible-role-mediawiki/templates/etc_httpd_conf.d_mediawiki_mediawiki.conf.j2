@@ -1,0 +1,12 @@
+DocumentRoot {{ mediawiki_install_path }}
+
+<Directory {{ mediawiki_install_path }}>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.+)$ index.php?title=$1 [PT,L,QSA]
+  Options Indexes FollowSymLinks MultiViews
+  Options FollowSymLinks MultiViews
+  AllowOverride None
+  Order allow,deny
+  Allow from all
+</Directory>

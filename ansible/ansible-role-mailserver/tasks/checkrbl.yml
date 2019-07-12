@@ -1,0 +1,19 @@
+- name: Install perl dependencies
+  yum: name={{ item }} state=present
+  with_items:
+    - perl
+    - perl-Net-IP
+    - perl-Net-DNS
+    - perl-Getopt-Long
+  tags:
+    - dependencies
+
+- name: Download check-rbl
+  get_url:
+    url: https://raw.githubusercontent.com/DjinnS/check-rbl/e83fac8f3e7fff63d1fa28acaa319aa3f1bcddff/check-rbl.pl
+    dest: /usr/local/bin/check-rbl.pl
+    mode: 0755
+    sha256sum: 0c48c6faf46aa1a332a0d9b50dec1796be8d49c88e2a914482ee3361ebc57e65
+
+- name: Install nightly check-rbl cronjob
+  cron: name="check-rbl" hour="2" minute="42" job="/usr/local/bin/check-rbl.pl -i {{ ansible_default_ipv4.address }}"

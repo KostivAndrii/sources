@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: Martin Milata
+  description: Pushes current branch of git repo from local machine to remote
+  company: base48
+  license: WTFPL
+  min_ansible_version: 1.2
+  platforms:
+  - name: EL
+    versions:
+    - all
+  - name: Fedora
+    versions:
+    - all
+  - name: Debian
+    versions:
+    - all
+  categories:
+  - development
+dependencies: []

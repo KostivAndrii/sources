@@ -1,0 +1,19 @@
+- name: install git_daemon packages
+  yum : name={{ item }} state=installed
+  with_items:
+  - git-daemon
+
+- name: install git service file
+  template:
+    src: git@.service.j2
+    dest: /etc/systemd/system/git@.service
+  notify: reload systemd
+
+- name: install git socket file
+  template:
+    src: git.socket.j2
+    dest: /etc/systemd/system/git.socket
+  notify: reload systemd
+
+- name: enable git socket
+  service: name=git.socket state=running enabled=yes

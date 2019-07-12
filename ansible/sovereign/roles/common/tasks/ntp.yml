@@ -1,0 +1,6 @@
+---
+- name: ntp | install chrony
+  yum: name=chrony state=installed
+
+- name: ntp | enable and start chrony
+  service: name=chronyd state=started enabled=yes

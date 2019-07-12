@@ -1,0 +1,21 @@
+common_install_packages:
+  - time
+  - screen
+  - tmux
+  - openssl
+  - vim
+  - policycoreutils-python
+
+common_remove_packages:
+  - ModemManager
+
+#common_resolv_search: "vpsfree.cz prg.vpsfree.cz base48.cz"
+#common_resolv_nameservers:
+#  - "172.17.4.11"
+
+common_hosts_add:
+  # - "1.2.3.4 example.org"
+
+common_firewalld: false
+common_ssh_keys: []
+common_selinux: true

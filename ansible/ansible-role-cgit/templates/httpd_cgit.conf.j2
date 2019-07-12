@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+<VirtualHost *:80>
+    ServerName cgit.{{ cgit_hostname }}
+
+    DocumentRoot "/usr/share/cgit"
+    Alias /cgit-data /usr/share/cgit
+    ScriptAlias /cgit /var/www/cgi-bin/cgit
+    <Directory "/usr/share/cgit">
+        Require all granted
+    </Directory>
+
+# FIXME: impossible to put on / ?
+#    <IfModule mod_rewrite.c>
+#        RewriteEngine on
+#        RewriteRule ^/cgit-data/(.*)$ /$1 [L]
+#        RewriteRule ^(.*)$ /cgit/$1 [L,PT]
+#    </IfModule>
+
+    ErrorLog /var/log/httpd/cgit-error.log
+    CustomLog /var/log/httpd/cgit-access.log combined
+</VirtualHost>
