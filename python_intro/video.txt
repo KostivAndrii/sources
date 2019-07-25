@@ -1,0 +1,19 @@
+5. Декоратори, Ітератори, Генератори, Дескрипотри
+   0:20:52 Мродулі пакети
+6. Ідіоматика + практичне прийоми
+  0:18 debug+profile+unitest
+  0:41 tkinter
+  0:45 widows COM objects
+       fabric3
+       subprocess
+       argparse/click
+       logging/loguru
+       html.parser
+       xml.etree/lxml
+       beautifulsoup4/cvs
+       json
+       pyaml/yaml
+       matplotlib
+7. DB
+   12:40 multithreading
+
