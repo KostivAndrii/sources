@@ -1,0 +1,38 @@
+---
+- name: refresh git index
+  local_action: command git -C {{ local_git_deploy_local_repo }} update-index -q --refresh
+
+- name: check for uncommitted changes
+  local_action: command git -C {{ local_git_deploy_local_repo }} diff-index --name-only HEAD --
+  register: git_dirty
+
+- name: check that the local repo is clean
+  assert:
+    that: git_dirty.stdout == ""
+
+- name: create git repo - mkdir
+  file: path={{ local_git_deploy_remote_repo }} state=directory
+
+- name: create git repo - git init
+  command: git init
+  args:
+    chdir: "{{ local_git_deploy_remote_repo }}"
+
+- name: allow pushing to checked out branch
+  command: git config receive.denyCurrentBranch warn
+  args:
+    chdir: "{{ local_git_deploy_remote_repo }}"
+
+- name: push git repo content to host
+  local_action: >
+    command git
+    -C {{ local_git_deploy_local_repo }}
+    push
+    --tags
+    ssh://{{ ansible_user_id }}@{{ inventory_hostname }}:{{ local_git_deploy_ssh_port }}/{{ local_git_deploy_remote_repo }}
+    +HEAD:{{ local_git_deploy_remote_branch }}
+
+- name: check out the pushed branch
+  command: git reset --hard {{ local_git_deploy_remote_branch }}
+  args:
+    chdir: "{{ local_git_deploy_remote_repo }}"

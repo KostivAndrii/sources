@@ -1,0 +1,38 @@
+---
+# Data directory.
+moin_data_dir: /srv/moin
+
+# Email host.
+#moin_mail_smarthost: localhost
+
+# Email From.
+moin_mail_from: "MoinWiki <noreply@example.com>"
+
+# User to run the WSGI processes as. You can use normal apache user here.
+moin_user: moin
+
+# User group, see above.
+moin_group: moin
+
+# Set this to no if the user/group already exists (e.g. when using apache).
+moin_user_create: yes
+
+# SSL port.
+moin_ssl_listen: 443
+
+moin_wikis:
+- name: testwiki        # needs to be comprised of ASCII characters
+  vhost: moin.local     # apache name-based virtual host
+  sitename: TestWiki    # site name, WikiWord?
+  front_page: FrontPage # front page
+  ssl_cert: /etc/pki/tls/certs/localhost.crt  # SSL cert
+  ssl_key: /etc/pki/tls/private/localhost.key # SSL key
+  ssl_chain: /etc/pki/tls/certs/localhost.crt # SSL chain, useful with LetsEncrypt
+  superuser: admin          # admin user (optional)
+  logo_string: TESTwiki     # logo string (optional)
+  theme_default: modernized # theme (optional)
+  language_default: en      # default language (optional)
+  extra_config:             # extra configuration lines (optional)
+  - "user_checkbox_defaults = {'show_page_trail': 0, 'edit_on_doubleclick': 0}"
+  - "page_credits = []"
+  - "actions_excluded = multiconfig.DefaultConfig.actions_excluded + ['newaccount']"

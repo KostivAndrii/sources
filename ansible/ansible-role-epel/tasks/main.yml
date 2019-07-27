@@ -1,0 +1,9 @@
+---
+
+- name: add EPEL repository
+  yum: name="{{ epel_repo_url }}" state=present
+  when: epel_enable and ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
+
+- name: add GPG key for EPEL
+  rpm_key: key="{{ epel_key_path }}" state=present
+  when: epel_enable and ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'

@@ -1,0 +1,9 @@
+---
+#cgit_hostname: (required)
+cgit_title: '{{ cgit_hostname }} git repositories'
+cgit_root: '/srv/git'
+cgit_scan_path: '{{ cgit_root }}/repositories'
+cgit_project_list: '{{ cgit_root }}/projects.list'
+
+# httpd alias where cgit is available
+cgit_script_alias: /cgit

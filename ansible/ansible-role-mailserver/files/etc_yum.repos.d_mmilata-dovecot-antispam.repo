@@ -1,0 +1,8 @@
+[mmilata-dovecot-antispam]
+name=Copr repo for dovecot-antispam owned by mmilata
+baseurl=https://copr-be.cloud.fedoraproject.org/results/mmilata/dovecot-antispam/epel-7-$basearch/
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://copr-be.cloud.fedoraproject.org/results/mmilata/dovecot-antispam/pubkey.gpg
+enabled=0
+enabled_metadata=1

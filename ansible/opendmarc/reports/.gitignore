@@ -1,0 +1,12 @@
+*.orig
+*.rej
+Makefile.in
+opendmarc-expire
+opendmarc-expire.8
+opendmarc-import
+opendmarc-import.8
+opendmarc-params
+opendmarc-params.8
+opendmarc-reports
+opendmarc-reports.8
+opendmarc-importstats.8

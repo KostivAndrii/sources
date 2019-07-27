@@ -1,0 +1,39 @@
+# -*- coding: iso-8859-1 -*-
+# IMPORTANT! This encoding (charset) setting MUST be correct! If you live in a
+# western country and you don't know that you use utf-8, you probably want to
+# use iso-8859-1 (or some other iso charset). If you use utf-8 (a Unicode
+# encoding) you MUST use: coding: utf-8
+# That setting must match the encoding your editor uses when you modify the
+# settings below. If it does not, special non-ASCII chars will be wrong.
+
+from farmconfig import FarmConfig
+from MoinMoin.config import multiconfig
+
+class Config(FarmConfig):
+
+    # basic options (you normally need to change these)
+    sitename = u'{{ item.sitename }}' # [Unicode]
+    interwikiname = u'{{ item.sitename }}' # [Unicode]
+
+    # name of entry page / front page [Unicode], choose one of those:
+    page_front_page = u"{{ item.front_page|default('FrontPage') }}"
+
+    data_dir = '{{ moin_data_dir }}/data/{{ item.name }}'
+    data_underlay_dir = '{{ moin_data_dir }}/underlay/{{ item.name }}'
+
+{% if item.superuser is defined %}
+    superuser = [u"{{ item.superuser }}"]
+{% endif %}
+{% if item.logo_string is defined %}
+    logo_string = u"{{ item.logo_string }}"
+{% endif %}
+{% if item.theme_default is defined %}
+    theme_default = u"{{ item.theme_default }}"
+{% endif %}
+{% if item.language_default is defined %}
+    language_default = u"{{ item.language_default }}"
+{% endif %}
+
+{% for line in item.extra_config|default([]) %}
+    {{ line }}
+{% endfor %}

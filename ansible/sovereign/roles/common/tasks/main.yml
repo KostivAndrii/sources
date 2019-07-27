@@ -1,0 +1,14 @@
+---
+- name: set hostname
+  hostname: name={{ inventory_hostname }}
+
+- name: update all packages
+  yum: name=* state=latest
+
+- name: install common packages
+  yum: name={{ item }} state=installed
+  with_items:
+  - vim
+  - tree
+
+- include: ntp.yml tags=ntp

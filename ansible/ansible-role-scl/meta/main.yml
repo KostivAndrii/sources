@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: "base48"
+  description: SCL (Software Collection Linux), package/collections management.
+  license: MIT
+  min_ansible_version: 2.0
+  platforms:
+   - name: EL
+     versions:
+      - 6
+      - 7
+   - name: Fedora
+     versions:
+      - 23
+      - 24
+      - 25
+  galaxy_tags:
+    - scl
+    - development
+    - system
+dependencies: []

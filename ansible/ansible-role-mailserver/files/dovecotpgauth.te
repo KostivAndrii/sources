@@ -1,0 +1,17 @@
+module dovecotpgauth 1.0;
+# allow dovecot to access postgresql
+
+require {
+       type dovecot_auth_t;
+       type postgresql_port_t;
+       type postgresql_tmp_t;
+       type postgresql_t;
+       class sock_file write;
+       class tcp_socket name_connect;
+       class unix_stream_socket connectto;
+}
+
+#============= dovecot_auth_t ==============
+allow dovecot_auth_t postgresql_port_t:tcp_socket name_connect;
+allow dovecot_auth_t postgresql_t:unix_stream_socket connectto;
+allow dovecot_auth_t postgresql_tmp_t:sock_file write;

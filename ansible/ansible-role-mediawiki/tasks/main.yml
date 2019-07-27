@@ -1,0 +1,12 @@
+
+- name: install mediawiki
+  include: mediawiki.yml
+  when: mediawiki_install
+
+- name: install mediawiki skins
+  include: skins.yml
+  when: mediawiki_install
+
+- name: install mediawiki extensions
+  include: extensions.yml
+  when: mediawiki_install

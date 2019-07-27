@@ -1,0 +1,30 @@
+---
+
+- name: get extensions from composer
+  shell: composer require {{ item.composer }}:{{ item.version | default("dev-master") }}
+    chdir={{ mediawiki_install_path }}
+  with_items: "{{ mediawiki_extensions }}"
+  when: item.composer is defined
+
+- name: check out extensions from git
+  git:
+    repo={{ item.url }}
+    dest={{ mediawiki_install_path }}/extensions/{{ item.name }}
+    version={{ item.version | default(mediawiki_release) }}
+    accept_hostkey=yes
+    update=no
+  with_items: "{{ mediawiki_extensions }}"
+  when: item.url is defined
+
+- name: initialize/update submodules
+  shell: git submodule init; git submodule update
+    chdir={{ mediawiki_install_path }}/extensions/{{ item.name }}
+  with_items: "{{ mediawiki_extensions }}"
+  when: item.submodule is defined and item.submodule
+
+- name: run composer update for extensions that require it
+  shell: composer update
+    chdir={{ mediawiki_install_path }}/extensions/{{ item.name }}
+  with_items: "{{ mediawiki_extensions }}"
+  when: item.composer_update is defined and item.composer_update
+

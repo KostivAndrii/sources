@@ -1,0 +1,26 @@
+---
+- name: nrpe_agent_plugins_path
+  set_fact:
+    nrpe_agent_plugins_path: /usr/lib/nagios/plugins
+
+- name: Install Nrpe and Plugins
+  package:
+    name: "{{ nrpe_agent_Debian }}"
+    state: latest
+    update_cache: yes
+    install_recommends: no
+  tags:
+   - nrpe_agent_install
+
+- name: Copy Nrpe Configuration
+  template:
+    src: nrpe.cfg.j2
+    dest: "{{ nrpe_agent_config }}"
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  notify:
+   - restart nagios-nrpe-server
+  tags:
+   - nrpe_agent_config

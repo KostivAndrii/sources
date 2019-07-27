@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Martin Milata <b42@srck.net>
+  description: Email server for individuals and small organizations
+  issue_tracker_url: https://github.com/nestihacky/ansible-role-mailserver/issues
+  license: GPLv3
+  min_ansible_version: 1.9
+  platforms:
+  - name: EL
+    versions:
+    - 7
+  categories:
+  - cloud
+  - networking
+dependencies:
+    - role: nestihacky.common
+    - role: nestihacky.postgresql

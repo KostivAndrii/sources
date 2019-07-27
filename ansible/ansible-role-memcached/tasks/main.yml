@@ -1,0 +1,16 @@
+---
+
+- name: install packages
+  yum : name={{ item }} state=present
+  with_items:
+    - memcached
+
+- template:
+    src: etc_sysconfig_memcached.j2
+    dest: /etc/sysconfig/memcached
+  notify:
+    restart memcached
+
+- name: start and enable service
+  service: name=memcached state=started enabled=yes
+

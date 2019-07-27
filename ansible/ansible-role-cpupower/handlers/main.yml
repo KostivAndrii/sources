@@ -1,0 +1,4 @@
+---
+
+- name: restart cpupower
+  service: "name=cpupower state=restarted"

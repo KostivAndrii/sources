@@ -1,0 +1,69 @@
+---
+
+pagure_datadir: /srv/git
+
+pagure_secret_key: CHANGE_ME
+pagure_secret_salt_email: CHANGE_ME
+
+pagure_auth: "fas" # local or fas
+
+pagure_domain: "git.example.org"
+pagure_app_url: "https://{{ pagure_domain }}"
+pagure_doc_app_url: "https://docs.{{ pagure_domain }}"
+pagure_git_url_ssh: "ssh://git@{{ pagure_domain }}/"
+pagure_git_url_git: "https://{{ pagure_domain }}/"
+pagure_eventsource_source: "https://{{ pagure_domain }}:8088"
+
+pagure_from_email: "pagure@{{ pagure_domain }}"
+pagure_email_error: "error@{{ pagure_domain }}" # where to send error tracebacks from webapp
+pagure_domain_email_notifications: "{{ pagure_domain }}"
+
+pagure_datagrepper_url: ""
+# "https://apps.fedoraproject.org/datagrepper"
+pagure_datagrepper_category: "pagure"
+
+pagure_ssl_listen: 14444
+#pagure_ssl_cert: "/etc/letsencrypt/live/{{ pagure_domain }}/cert.pem"
+#pagure_ssl_key: "/etc/letsencrypt/live/{{ pagure_domain }}/privkey.pem"
+#pagure_ssl_chain: "/etc/letsencrypt/live/{{ pagure_domain }}/chain.pem"
+
+#pagure_docs_ssl_cert: "/etc/letsencrypt/live/docs.{{ pagure_domain }}/cert.pem"
+#pagure_docs_ssl_key: "/etc/letsencrypt/live/docs.{{ pagure_domain }}/privkey.pem"
+#pagure_docs_ssl_chain: "/etc/letsencrypt/live/docs.{{ pagure_domain }}/chain.pem"
+
+devel_ssl_cert: /etc/pki/tls/certs/localhost.crt
+devel_ssl_key: /etc/pki/tls/private/localhost.key
+
+pagure_ssl_cert: "{{ devel_ssl_cert }}"
+pagure_ssl_key: "{{ devel_ssl_key }}"
+pagure_ssl_chain: "{{ devel_ssl_key }}"
+
+pagure_docs_ssl_cert: "{{ devel_ssl_cert }}"
+pagure_docs_ssl_key: "{{ devel_ssl_key }}"
+pagure_docs_ssl_chain: "{{ devel_ssl_key }}"
+
+pagure_db_user: pagure
+pagure_db_host: localhost
+pagure_db_name: pagure
+pagure_db_pass: CHANGE_ME
+
+# kinda redundant for us as we trust root with access
+# but might be useful for someone if postgres is running
+# on different machine. Only used ini alembic.ini for database
+# migrations
+pagure_db_admin_user: postgres
+pagure_db_admin_pass: CHANGE_ME
+
+# ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub
+# cat /etc/ssh/ssh_host_rsa_key.pub
+# ssh-keygen -lf /etc/ssh/ssh_host_ecdsa_key.pub
+# cat /etc/ssh/ssh_host_ecdsa_key.pub
+pagure_keys:
+  - name: rsa
+    fingerprint: "2048 71:79:9e:e9:d9:d6:b8:41:62:1b:f3:88:b5:d0:4d:7f   (RSA)"
+    pubkey: "git.48.io,37.205.10.103 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCUYbsZMoTCYlSRBVe8YeJePWyl3V9HdRscODepfA3xcoXxgceIjHPjlM/VesC/Qp0LTAhlqdFOWau/dH/1nqVKaRA0RNlK25JcTHskGlVvMGKWiAMcjCTsC0cw8oddFH6KdAmmWkIpwDAG+9ubuOCietMIlu3OdmnDGOOt9EVNk2My9U7oquwB3+gACH21oJ08l059lYWVZDAK09XU8Lgt1Nj7sHNZVKSo49ATLvEREdLCrC1LuxK4esMiHHT89R9ulu6X0fdkvVRNqtbA7Dnqlm92d85BKz6z7mZiiy9s2lGhzmwvhONIDVoWoeaXw94wfgrg5OKJrVrXru5MDF1d"
+  - name: ecdsa
+    fingerprint: "256 92:b5:d4:ed:73:dd:c8:30:e2:e9:58:a0:48:6c:c5:91   (ECDSA)"
+    pubkey: "git.48.io,37.205.10.103 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHoFElUYXDF1NCr26XB0cMJwaIg7NP4XYeuHwrHuwCCNpu6BK2DdP4YoEzW3iKzQyxocpH0WzOYYnO5KAx4o="
+
+

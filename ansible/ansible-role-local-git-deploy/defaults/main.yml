@@ -1,0 +1,5 @@
+---
+local_git_deploy_ssh_port: 22
+local_git_deploy_remote_branch: deploy
+local_git_deploy_local_repo: REQUIRED VARIABLE
+local_git_deploy_remote_repo: REQUIRED VARIABLE

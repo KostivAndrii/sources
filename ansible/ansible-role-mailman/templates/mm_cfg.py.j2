@@ -1,0 +1,15 @@
+#{{ ansible_managed }}
+
+from Defaults import *
+import pwd, grp
+
+MAILMAN_UID = pwd.getpwnam('mailman')[2]
+MAILMAN_GID = grp.getgrnam('mailman')[2]
+
+DEFAULT_URL_HOST   = '{{ mailman_domain }}'
+DEFAULT_EMAIL_HOST = '{{ mailman_domain }}'
+DEFAULT_URL_PATTERN = 'https://%s/mailman/'
+
+add_virtualhost(DEFAULT_URL_HOST, DEFAULT_EMAIL_HOST)
+
+MTA='Postfix'

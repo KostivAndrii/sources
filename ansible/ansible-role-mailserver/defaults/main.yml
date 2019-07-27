@@ -1,0 +1,49 @@
+---
+# mailserver
+mailserver_db_username: mailuser
+# mailserver_db_password: (required)
+mailserver_db_database: mailserver
+
+mailserver_opendmarc_db_username: opendmarc
+# mailserver_opendmarc_db_password: (required)
+mailserver_opendmarc_db_database: opendmarc
+
+# mailserver_admin_email: (required)
+# mailserver_hostname: (required)
+# mailserver_domain: (required, typically mailserver_hostname minus the first component)
+#mailserver_autoconfig_hostname: autoconfig.{{ mailserver_hostname }}
+
+mailserver_friendly_networks: []
+mailserver_header_privacy: true
+
+# mailserver_domains: (required)
+# mailserver_users: (required)
+# mailserver_aliases: (required)
+
+mailserver_data_dir: /opt/mailserver
+
+devel_ssl_cert: /etc/pki/tls/certs/localhost.crt
+devel_ssl_key: /etc/pki/tls/private/localhost.key
+
+# what the server presents to clients
+mailserver_ssl_cert: "{{ devel_ssl_cert }}"
+mailserver_ssl_key: "{{ devel_ssl_key }}"
+
+# system CAs to verify other servers against
+mailserver_ssl_ca: /etc/pki/tls/certs/ca-bundle.crt
+
+# use letsencrypt in production
+#mailserver_ssl_cert: "/etc/letsencrypt/live/{{ common_hostname_domain }}/cert.pem"
+#mailserver_ssl_key: "/etc/letsencrypt/live/{{ common_hostname_domain }}/privkey.pem"
+
+# used by mailman
+postfix_alias_maps_append:
+postfix_local_recipient_maps_append:
+postfix_mydestination_append:
+
+# used by pagure milter
+postfix_smtpd_milters_append:
+
+semodule_dest: /opt/ansible-selinux-modules/
+mailserver_semodule_te:
+  - dovecotpgauth.te

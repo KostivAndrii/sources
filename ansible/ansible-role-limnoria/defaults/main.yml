@@ -1,0 +1,12 @@
+---
+limnoria_user: limnoria
+limnoria_create_user: true
+limnoria_dir: /srv/limnoria
+limnoria_config: /srv/limnoria/limnoria.conf
+# limnoria_archive: (optional)
+
+limnoria_plugins_git:
+- repo: https://github.com/mmilata/supy-decide.git
+  name: Decide
+#- repo: https://github.com/hackerspace/supy-mwrc.git
+#name: MediaWikiRecentChanges

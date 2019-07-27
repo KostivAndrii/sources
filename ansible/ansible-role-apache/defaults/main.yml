@@ -1,0 +1,40 @@
+---
+
+apache_server_name: example.org
+apache_no_welcome_conf: true
+apache_no_userdir_conf: true
+
+# aliases
+
+apache_aliases:
+#- { alias: '/something', dir: '/var/www/html/place' }
+
+# SSL
+
+apache_ssl: true
+
+apache_ssl_listen: 443
+apache_ssl_server_name: "{{ apache_server_name }}"
+
+apache_ssl_cert: /etc/pki/tls/certs/localhost.crt
+apache_ssl_key: /etc/pki/tls/private/localhost.key
+#apache_ssl_chain: /etc/pki/tls/certs/server-chain.crt
+#apache_ssl_cacert: /etc/pki/tls/certs/ca-bundle.crt
+# According to:
+# https://mozilla.github.io/server-side-tls/ssl-config-generator/
+#
+apache_ssl_protocol: 'all -SSLv3 -TLSv1'
+apache_ssl_cipher_suite: 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK'
+apache_ssl_honor_cipher_order: 'on'
+
+# FIXME: on/off needs filters
+apache_ssl_compression: 'off'
+# FIXME: not understood by httpd-2.4.6-40.el7.centos.x86_64
+# and mod_ssl-2.4.6-40.el7.centos.x86_64, openssl-1.0.1e-51.el7_2.2.x86_64
+#apache_ssl_session_tickets: 'off'
+
+# SELinux
+httpd_tmp_exec: False
+httpd_can_network_connect: False
+httpd_can_network_connect_db: False
+httpd_execmem: False

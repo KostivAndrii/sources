@@ -1,0 +1,12 @@
+---
+
+#- name: install template
+#  template:
+#    src=.cfg.j2
+#    dest=/etc/
+#    owner=root group=root mode=0640
+#  notify:
+#    - restart template
+#
+#- name: start and enable service
+#  service: name=template state=started enabled=yes

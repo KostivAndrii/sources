@@ -1,0 +1,11 @@
+#{{ ansible_managed }}
+#!/bin/bash
+scl-shebang-php{{ scl_php_version }} maintenance/install.php \
+    "{{ mediawiki_name }}" \
+    "{{ mediawiki_admin_username }}" \
+    --pass "{{ mediawiki_admin_password }}" \
+    --dbtype "{{ mediawiki_db_type }}" \
+    --dbserver "{{ mediawiki_db_host }}" \
+    --dbname "{{ mediawiki_db_database }}" \
+    --dbuser "{{ mediawiki_db_username }}" \
+    --dbpass "{{ mediawiki_db_password }}"

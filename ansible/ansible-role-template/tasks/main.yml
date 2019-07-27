@@ -1,0 +1,7 @@
+---
+
+- include: install.yml
+- include: conf.yml
+
+#- include: feature.yml
+#  when: feature

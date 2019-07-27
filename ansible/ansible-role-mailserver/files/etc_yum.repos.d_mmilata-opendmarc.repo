@@ -1,0 +1,10 @@
+[mmilata-opendmarc]
+name=Copr repo for opendmarc owned by mmilata
+baseurl=https://copr-be.cloud.fedoraproject.org/results/mmilata/opendmarc/epel-7-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://copr-be.cloud.fedoraproject.org/results/mmilata/opendmarc/pubkey.gpg
+repo_gpgcheck=0
+enabled=0
+enabled_metadata=1

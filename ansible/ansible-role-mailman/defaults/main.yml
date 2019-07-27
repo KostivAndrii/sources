@@ -1,0 +1,18 @@
+---
+
+mailman_admin: admin@example.org
+mailman_domain: lists.example.org
+mailman_password: CHANGE_ME
+
+mailman_ssl_listen: 14445
+
+#mailman_ssl_cert: "/etc/letsencrypt/live/{{ mailman_domain }}/cert.pem"
+#mailman_ssl_key: "/etc/letsencrypt/live/{{ mailman_domain }}/privkey.pem"
+#mailman_ssl_chain: "/etc/letsencrypt/live/{{ mailman_domain }}/chain.pem"
+
+devel_ssl_cert: /etc/pki/tls/certs/localhost.crt
+devel_ssl_key: /etc/pki/tls/private/localhost.key
+
+mailman_ssl_cert: "{{ devel_ssl_cert }}"
+mailman_ssl_key: "{{ devel_ssl_key }}"
+mailman_ssl_chain: "{{ devel_ssl_key }}"

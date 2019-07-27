@@ -1,0 +1,430 @@
+			OPENDMARC RELEASE NOTES
+
+This listing shows the versions of the OpenDMARC package, the date of
+release, and a summary of the changes in that release.
+
+1.3.2		2016/12/19
+	Feature request #86: Change meaning of "RequiredHeaders" such that
+		header validity is always checked, but messages are only
+		rejected on that basis when the flag is set.  Based
+		on a patch from Andreas Schulze.
+	Feature request #127: Log SPF results when rejecting.  Requested
+		by Patrick Wagner; patch from Andreas Schulze, follow-up
+		patch from Juri Haberland.
+	Feature request #138: Inculde policy and disposition information
+		in an Authentication-Results comment.  Based on a patch
+		from Juri Haberland.
+	Feature request #139: Include the client host name if known
+		in failure reports.  Suggested by Roland Turner;
+		patch by Andreas Schulze.
+	Fix bug #95: Assume IPv6 for SPF operations.  Patch from Juri Haberland.
+	Fix bug #120: Fix control logic around the SPF result.
+		Reported by Christophe Wolfhugel; patch from Andreas Schulze.
+	Fix bug #122: Don't skip the HELO milter phase when SPF is enabled.
+		Reported by Christophe Wolfhugel.
+	Fix bug #157: Fix logging of implicit authserv-ids.  Reported
+		by Andreas Schulze; patch from Juri Haberland.
+	Fix bug #158: Log ignored connections.  Patch from Andreas Schulze.
+	Fix bug #160: Fix "SyslogFacility" handling.  Patch from
+		Juri Haberland.
+	Fix bug #163: Use a larger buffer for the raw MAIL FROM value.
+		Based on a patch from Andreas Schulze.
+	Fix bug #174: Trim "!" suffixes from reporting addresses.  Problem
+		noted by Juri Haberland.
+	Fix bug #186: When reloading the configuration file, the public
+		suffix list was read in with the wrong comment indicator.
+		Patch from Federico Omoto.
+	LIBOPENDMARC: Fix bug #115: Fix type mismatch.  Patch from
+		Sebastian A. Siewior via Scott Kitterman.
+	LIBOPENDMARC: Fix bug #121: Fix IPv6 CIDR matching in SPF code.
+		Patch from Christophe Wolfhugel.
+	LIBOPENDMARC: Fix bug #125: Compile time IPv6 fix.  Reported by
+		Christophe Wolfhugel.
+	LIBOPENDMARC: Fix bug #131: Fix alignment bug.  Patch from
+		Andreas Schulze.
+	LIBOPENDMARC: Fix bug #147: Fix stripping of whitespace from
+		DMARC DNS records.  Based on a patch from Job Noorman.
+	LIBOPENDMARC: Fix bug #149: Apply "sp" setting, if present and
+		applicable.  Patch from Petr Novak.
+	LIBOPENDMARC: Fix bug #154: Fix "rf" and "fo" processing logic.
+	LIBOPENDMARC: Fix bug #156: Fix variable name.  Patch by
+		Andreas Schulze.
+	LIBOPENDMARC: Fix bug #165: Fix logic in checking which SPF
+		identifier was used.  Patches from Marco Favero and
+		Juri Haberland.
+	LIBOPENDMARC: Fix bug #167: Don't return "fail" when we should
+		return "none".  Patch from Marco Favero.
+	REPORTS: Fix bug #134: Handle SMTP errors correctly.  Patch from
+		Andreas Schulze.
+	REPORTS: Fix bug #141: Set the HELO parameter correctly.
+		Reported by Alan Smith; patch from Andreas Schulze.
+	REPORTS: Fix bug #143: Fix logic in table truncation.
+		Reported by Wayne Andersen; patch from Juri Haberland.
+	REPORTS: Fix bug #162: Always report "sp" in aggregate reports.
+		Patch from Juri Haberland.
+	REPORTS: Fix bug #166: Fix report start/end time logic.
+		Patch from Juri Haberland.
+	REPORTS: Fix bug #188: Don't delete inputs too early in
+		opendmarc-reports.  Patch from Juri Haberland.
+	TOOLS: Fix bug #161: "Forensic" reports were renamed "Failure"
+		reports.  Patch from Andreas Schulze.
+	TOOLS: Fix bug #164: Handle IPv6 test addresses.  Reported by
+		Andreas Schulze; patch from Juri Haberland.
+	DOCS: Patch #189: Replace the DMARC RFC with an HTML page
+		referencing the relevant specs, since Debian doesn't
+		consider RFCs to be "free".  Patch from Scott Kitterman
+		via Juri Haberland.
+
+1.3.1		2015/02/23
+	Fix bug #97: Add ability to change envelope sender, client IP
+		address, client hostname, and HELO value used in test
+		mode, via environment variables.  This can be turned
+		into something more formal in a later release.  Suggested
+		by Andreas Schulze.
+	Fix bug #102: Don't lose SPF results and output the "-1" default.
+		Reported by Kurt Roeckx.
+	Fix bug #103: Fix IgnoreAuthenticatedClients by requesting the
+		right macro value from the MTA.
+	Fix bug #113: Remove "TemporaryDirectory" (unused).  Patch from
+		Andreas Schulze.
+	LIBOPENDMARC: Fix bug #104: Include <sys/param.h> and <resolv.h>
+		in <opendmarc/dmarc.h> so that MAXPATHLEN and MAXNS get
+		defined consistently.  Reported by Frank J. Lhota.
+	LIBOPENDMARC: Fix bug #105: Get the h_errno definition from
+		<netdb.h> rather than declaring it.  Problem noted
+		by Frank J. Lhota.
+	LIBOPENDMARC: Fix bug #106: Clean up issues with the types passed
+		to opendmarc_policy_library_dns_hook().  Noted by
+		Frank J. Lhota.
+	DOCS: Fix bug #99: Update list of constraints on
+		opendmarc_policy_fetch_alignment().  Reported by
+		Frank J. Lhota.
+	REPORTS: Fix bug #108: Handle malformed mailto URIs in DMARC
+		records (e.g., just "mailto:").  Reported by Andreas Schulze.
+	REPORTS: Fix bug #110: Support SQL backend selection in
+		opendmarc-expire.  Reported by Mark Reidenbach.
+
+1.3.0		2014/07/31
+	Integrated SPF checking is now available through the new
+		SPFSelfValidate and SPFIgnoreResults settings.
+	Feature request #79: Optionally ignore clients that authenticated
+		using SMTP AUTH.
+	Fix bug #60, part II: Default AuthservID to the name provided by the
+		MTA, not the local host name, which is consistent with what
+		OpenDKIM does.  Suggested by Robbert Klarenbeek.
+	Fix bug #72: Don't crash when From fields are absent.  Patch from
+		Andreas Schulze.
+	Fix bug #74: Change "Forensic" to "Failure" just about everywhere
+		to match the language now being used in the base DMARC
+		draft.  Note that this also changes some names in the
+		configuration file.
+	Fix bug #75: Correct typo in MIME of forensic reports.  Reported by
+		Julian Mehnle.
+	Fix bug #76: Repair damage with respect to Authentication-Results
+		header field selection.  Reported by Todd Lyons.
+	Fix bug #77: Request quarantine from the MTA during option
+		negotiation.  Reported by Richard Platel.
+	Fix bug #78: Add missing newline in forensic report header.
+	Fix bug #90: Make "--with-sql-backend" without any value do the
+		right thing.  Reported by Scott Kitterman.
+	Fix bug #93: Honor size limits in URIs.  Patch from Tomki Camp.
+	Make "smime" and "rrvs" legal Authentication-Results methods.
+	Provide better logging when pclose() for a forensic report returns
+		non-zero.  Problem noted by Michael Nausch.
+	Add configuration support for internal SPF checks.  Includes hooks in
+		the milter to check that SPF is configured to do so.
+		This can use a private SPF implementation or libspf2.
+	Fix strlcat() and strlcpy() support for Debian.  Patch from Scott
+		Kitterman.
+	REPORTS: Feature request #80: Generate aggregate reports on UTC
+		day boundaries.  Requested by Tomki Camp.
+	REPORTS: Feature request #84: Optionally expire old data from
+		lower-growth tables.  Requested by Christoph Steindl.
+	REPORTS: Fix bug #70: Fix date range generation in reports.  Patch
+		from Karol Augustin.
+	REPORTS: Fix bug #82: Fix recording of report timestamp to avoid lost
+		records.  Reported by Christoph Steindl.
+	REPORTS: Fix bug #83: When expiring data, truncate the signatures table
+		if all messages were expired.  Reported by Christoph Steindl.
+	REPORTS: Fix bug #85: Report subdomain policy.  Patch from
+		Christoph Steindl.
+	LIBOPENDMARC: Fix bug #71: Fix "rua" extraction from DMARC records
+		Problem noted by Karol Augustin.
+	LIBOPENDMARC: Added support for milter to perform own spf checks.
+		Three new files: opendmarc_spf.c, opendmard_spf_dns.c and
+		test/test_spf.cl, allow integrated SPF support.  Support for
+		use of libspf2 is also provided.
+
+1.2.0		2014/03/14
+	Feature request #44: Allow override of the From: field on forensic
+		reports.  Requested by Scott Kitterman.
+	Feature request #45: Log the host portion of ignored
+		Authentication-Results fields at "debug" level.  Suggested
+		by Andreas Schulze.
+	Feature request #56: Add "RequiredHeaders" setting to enforce syntax
+		checks against a message and reject those that don't comply.
+		Suggested by Franck Martin; additional code from Andreas
+		Schulze.
+	Feature request #65: Add "ForensicReportsBcc".  Requested by
+		Franck Martin.
+	Fix bug #46: Charitable tweak to a couple of log messages.  Requested
+		by Andreas Schulze.
+	Fix bug #55: The "SoftwareHeader" setting wasn't being set properly.
+		Problem noted by Birta Levente.
+	Fix bug #58: The "smtp.mailfrom" part of an Authentication-Results
+		field might contain only a domain name.  Problem noted by Scott
+		Kitterman.
+	Fix bug #60: Default AuthservID to the name provided by the MTA,
+		not the local host name, which is consistent with what
+		OpenDKIM does.  Suggested by Robbert Klarenbeek.
+	Merge request #2: Validate external recipients before adding them to
+		report recipient lists.  Code from Will Orr.
+	Record all DKIM results to the history file, rather than only
+		passing results.
+	BUILD: Fix bug #50: Check libbsd for strlcat() and strlcpy() so we
+		don't make our own when we don't need to.  Requested by
+		Scott Kitterman.
+	CONTRIB: Fix bug #52: Update path to draft RFC in contrib/spec.
+		Problem noted by Kevin San Diego.
+	CONTRIB: Fix bug #59: Allow database name, userid and password to be
+		specified on the command line rather than hard-coding them.
+		Problem noted by Scott Kitterman.
+	DOCS: Fix bug #48: Add a libopendmarc use overview page.
+	DOCS: Fix bug #53: Add man page for opendmarc-importstats.  Requested
+		by Scott Kitterman.
+	REPORTS: Fix bug #51: Check status after every phase of SMTP when
+		sending reports.  Suggested by Todd Lyons.
+	REPORTS: Fix DKIM status importing.
+	LIBOPENDMARC: Fix bug #68: Fix strict/relaxed checking logic when
+		a public suffix list is available.  Reported by
+		Andreas Schulze.
+	LIBOPENDMARC: Fixed a bug where in some instances the fetch of the
+		orgainizational domain could wrongly return the from domain. 
+	LIBOPENDMARC: Fix call to missing function.  Patch from William Orr.
+
+1.1.3		2013/04/13
+	Fix reporting of nonexistent SPF results.  Problem noted by
+		Andrei Ioachim.
+	Fix extraction of data from Received-SPF.  Problem noted by
+		Todd Lyons.
+	LIBOPENDMARC: Fix bug #47: Make sure that
+		opendmarc_policy_fetch_utilized_domain() returns the
+		organizational domain if that's the domain whose policy
+		was selected.  Reported by John Mears.
+
+1.1.2		2013/03/27
+	Do Authentication-Results keyword parsing in a case-insensitive
+		manner.  Problem noted by Chris Meidinger.
+	If the Authentication-Results for SPF didn't include one of the two
+		expected properties, don't crash.  Problem noted by
+		Chris Meidinger.
+	Fix a data load problem with TestDNSData.
+
+1.1.1		2013/03/18
+	Don't crash when postfix reports no IP address.  Problem reported
+		by Andrei Ioachim.
+	Add "TemporaryDirectory" to the list of valid config file items.
+
+1.1.0		2013/03/08
+	Feature request #34: Add support for local DNS overrides to enable
+		testing without Internet access.  Requested by Scott Kitterman.
+	Feature request #35: Add "ForensicReportsOnNone".  Requested by
+		Scott Kitterman.
+	Feature request #41: Log the domain name with the result.  Requested
+		by Scott Kitterman.
+	Don't fail to start on empty or null configuration files.  Problem
+		noted by Steve Jenkins.
+	LIBOPENDMARC: Fix bug #38: Avoid huge retry loops when parsing
+		non-DMARC TXT records, such as wildcards.  Problem noted
+		by Andreas Schulze.
+	LIBOPENDMARC: Add opendmarc_policy_fetch_fo(),
+		opendmarc_policy_fetch_rf(), and
+		opendmarc_policy_to_buf().
+	REPORTING: Feature request #39: Add a MySQL script for setting up the
+		reporting tables.  Suggested by Scott Kitterman.
+
+1.0.1		2012/11/16
+	Fall back to lockf() if flock() support isn't available.
+	Fix faulty SPF error logging.  Problem noted by Benny Pedersen. 
+	REPORTING: Improve temporary file cleanup in opendmarc-reports.
+	CONTRIB: Fixes to configuration file generation in the spec file.
+		Problem noted by Steve Mays.
+
+1.0.0		2012/10/25
+	Rename "AlwaysDeliver" to "RejectFailures" and flip the logic.
+	Feature request #26: Don't overload "AuthservID"; instead, the list
+		of trusted authserv-ids is now specified by a
+		new "TrustedAuthservIDs" setting.  Requested by Andreas Schulze.
+	Feature request #28: Add "CopyFailuresTo" which adds the specified
+		recipient to the message when DMARC failures occur.
+		Requested by Andreas Schulze.
+	Feature request #30: Improve logging by indicating what the return
+		path was when a parse failure occurred, and what the final
+		DMARC result was.  Requested by Andreas Schulze.
+	Evaluate based on the envelope sender reported by
+		Authentication-Results and not on what was in the actual
+		envelope.
+	REPORTING: Feature request #27: Add "--nodomain" to opendmarc-reports
+		to skip report generation for specific domains.
+	LIBOPENDMARC: Fix bug #31: Improve From: field parsing.  Problem
+		reported by Todd Lyons.
+
+0.2.2		2012/09/14
+	Fix bug #25: Use locks to co-ordinate between the filter writing
+		to the history file and opendmarc-import consuming it.
+		Problem noted by Marcos Vieira.
+	Don't use dmarcf_dstring_printf() where dmarcf_dstring_cat() suffices.
+	Add Authentication-Results fields honouring AuthservIDWithJobID.
+		Problem noted by Andreas Schulze.
+	Improve logic that identifies usable Authentication-Results fields.
+		Problem noted by Andreas Schulze.
+	REPORTING: Handle multiple "rua" values in both reporting scripts.
+		Problem noted by Andreas Schulze.
+	REPORTING: Get the date range right on reports.  Problem noted by
+		Todd Lyons and Andreas Schulze.
+
+0.2.1		2012/08/31
+	Don't crash during shutdown by accessing freed memory.  Problem
+		reported by Todd Lyons.
+	Update the command line usage message, which was terribly outdated.
+	Fix handling of an SPF pass when the envelope doesn't contain a
+		usable domain name.
+	Fix a crash problem having to do with default authserv-ids.
+	Fix an off-by-one string length comparison error when checking for
+		relevant authentication results.
+
+0.2.0		2012/08/24
+	Feature request #15: If there's no SPF Authentication-Results field,
+		look for a Received-SPF field to get SPF results.
+	Feature request #16: Add "RecordAllMessages" setting to record all
+		messages (the previous default).  The new default is to record
+		only those messages whose From: domains had a published
+		DMARC record.
+	Feature request #19: Add "IgnoreMailFrom" setting, allowing mail from
+		specific domains to be ignored.
+	Feature request #20: Allow "AuthservID" to be a comma-separated list
+		of authserv-ids to trust as local.  The first one is used
+		in header field generation.  Suggested by Andreas Schulze.
+	Fix bug #18: Pass the absence of a "rua" field in a DMARC record
+		to the history file and into the "requests" table.
+	Prevent crashes when parsing horribly malformed From: fields.
+		Problem noted by Todd Lyons.
+	Don't apply a default IgnoreHosts list in test mode.  Problem noted
+		by Marcos Vieira.
+	Don't expire request records for stuff that's never been generated
+		yet.  Problem noted by Todd Lyons.
+	Register the filter with SMFIF_ADDHDRS not SMFIF_CHGHDRS.  Problem
+		noted by Todd Lyons.
+	Fix bounds checking in dmarcf_dstring_printf().  Problem noted by
+		Marcos Vieira.
+	Arrays created in-place from strings don't need to have their elements
+		freed.  Problem noted by Andreas Schulze.
+	BUILD: Install non-user scripts under sbin instead of bin.  Problem
+		noted by Andreas Schulze.
+	CONTRIB: Add contrib/init/redhat and contents.  Provided by Todd Lyons.
+	CONTRIB: Add contrib/spec and contents.  Provided by Todd Lyons.
+	DB: Add some indexes to optimize operations.  Suggested by Todd Lyons.
+	LIBOPENDMARC: Fix bug #22: Minimal solution to alignment checks when
+		no public suffix list is provided.  Problem noted by
+		Todd Lyons.
+	REPORTING: Feature request #17: Add "opendmarc-params" tool, and
+		tie it to opendmarc-import, so that administrators can force
+		reports for specific domains to go to specific destinations
+		regardless of DMARC record contents.
+	REPORTING: Feature request #21: Add "--test" and "--keepfiles" options
+		to opendmarc-reports.  Patch from Todd Lyons.
+	REPORTING: Add opendmarc-importstats.
+	REPORTING: Variable verbose levels in opendmarc-report.  Patch from
+		Todd Lyons.
+	TOOLS: Feature request #14: Add "openmarc-check" command line tool for
+		translating DMARC records found in the DNS.
+
+0.1.8		2012/07/30
+	Fix Linux build issue.
+	REPORTING: Patch #13: Have report generation use SMTP directly.
+		Patch from Andreas Schulze.
+
+0.1.7		2012/07/26
+	Fix bug #5: Add "IgnoreHosts" setting.
+	Fix bug #9: Honour "pct" setting (or its default).
+	REPORTING: Fix bug #6: Add opendmarc-expire script.
+	LIBOPENDMARC: Fix bug #7: Chase down CNAMEs if the resolver doesn't
+		do it for you.  Problem noted by Tim Draegen.
+	LIBOPENDMARC: Fix bug #10: When DKIM is in alignment, don't
+		short-circuit past SPF alignment tests.  Problem noted by
+		Mike Adkins and Steve Jones.
+	LIBOPENDMARC: Fix bug #12: Fix a false positive alignment problem
+		in the "relaxed" case.
+	CONTRIB: Add a start/stop script.  Contributed by Steve Mays.
+
+0.1.6		2012/07/20
+	Don't report false passes for SPF.  Problem noted by Tim Draegen.
+	When opendmarc_policy_query_dmarc() fails, log the domain that was
+		being checked.
+	LIBOPENDMARC: Return DMARC_POLICY_NONE from
+		opendmarc_get_policy_to_enforce() when "p=none" was found.
+		DMARC_POLICY_PASS is only returned if alignment was discovered.
+	REPORTING: Bug #4: Use report begin/end times based on message
+		timestamps rather than last report's time/current time.
+		Reported by Julian Mehnle.
+
+0.1.5		2012/07/19
+	Add "Auth-Failure" field to forensic reports.
+	LIBOPENDMARC: Fix a bug in "ri" parsing.
+
+0.1.4		2012/07/15
+	LIBOPENDMARC: Fix a bug in dmarc_dns_get_record().  Reported by
+		Andreas Schulze.
+	LIBOPENDMARC: Fix library build for C++ compilers.  Reported by
+		Andrew Birchall.
+	DB: Delete domains.lastsent, as it is unused.
+	REPORTING: Fix column name error in opendmarc-reports.  Reported
+		by Andreas Schulze.
+	REPORTING: Fix generated aggregate report header.  Patch by
+		Andreas Schulze.
+	REPORTING: Call setlocale() in opendmarc-reports.  Requested by
+		Andreas Schulze.
+	CONTRIB: Pull down a new version of rddmarc.  From John Levine.
+
+0.1.3		2012/07/14
+	Fix up the MIME syntax in AFRF reports.  Patch from Andreas Schulze.
+    	Fix bug #2: Remove dmarcf_dkim_select(); logic has been moved into
+		libopendmarc.
+	Fix Authentication-Results field syntax.
+	Don't generate an AFRF report on other than "reject" and "quarantine"
+		results.
+	Fix a test mode crash condition, and initialize a few minor things
+		before entering test mode so AFRFs come out cleaner.
+    	Add "ReportCommand" to the valid configuration file item list.
+	Ignore "header.i" when parsing DKIM authentication results.  We only
+		care about "header.d".
+	Check for return status of opendmarc_policy_query_dmarc() and do
+		the right thing with it.
+	BUILD: Include the "db" directory.
+	REPORTING: Fix bug #3: Drop XML::Generator and do it by hand, since we
+		need to generate the array of DKIM signature data (there can
+		be more than one) as a sub-query.
+	LIBOPENDMARC: If the From: domain didn't have a DMARC policy and
+		there's no Organizational Domain available, return the
+		correct result code.
+
+0.1.2		2012/07/11
+	LIBOPENDMARC: Use strlcat()/strlcpy().
+	BUILD: Add -lresolv where needed in more places (libopendmarc unit
+		tests this time).  Problem noted by Andreas Schulze.
+	BUILD: Split filter checks and live library checks into different
+		"--enable" flags.  Problem noted by Andreas Schulze.
+	BUILD: Actually do something with "--disable-filter".  Problem
+		noted by Andrew Birchall.
+
+0.1.1		2012/07/10
+	LIBOPENDMARC: Add strlcat() and strlcpy() if not provided in libc.
+		Problem noted by Andreas Schulze.
+	REPORTS: Fix generated XML format ("auth_results" is a sibling of
+		"row", not a child of it).  Reported by John Levine.
+	BUILD: Add -lresolv where needed.  Problem noted by Andreas Schulze.
+	BUILD: Clean up an errant "configure" line.  Problem noted by
+		Andreas Schulze.
+
+0.1.0		2012/07/09
+	Initial Beta release.

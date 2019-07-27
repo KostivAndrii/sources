@@ -1,0 +1,20 @@
+---
+
+- name: Databases | Make sure the PostgreSQL databases are present
+  postgresql_db:
+    name: "{{  item.name  }}"
+    encoding: "{{ postgresql_encoding }}"
+    lc_collate: "{{ postgresql_locale }}"
+    lc_ctype: "{{ postgresql_locale }}"
+    template: "template0"
+    state: present
+  with_items: "{{ postgresql_databases }}"
+  when: postgresql_databases|length > 0
+  notify: "{% if 'notify' in item %}{{ item.notify }}{% else %}pass{% endif %}"
+
+- name: Databases | Add hstore to the databases with the requirement
+  sudo: yes
+  sudo_user: "{{ postgresql_admin_user }}"
+  shell: "psql {{ item.name }} -c 'CREATE EXTENSION IF NOT EXISTS hstore;'"
+  with_items: "{{ postgresql_databases }}"
+  when: "item.hstore is defined and item.hstore == 'yes'"

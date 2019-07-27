@@ -1,0 +1,7 @@
+---
+
+sniproxy_routes:
+#  - domain: "git.example.org"
+#  - target: "127.0.0.1:4443"
+#  - domain: "proxied.example.org"
+#  - target: "[2a03:3b40:7:5:3000::52]:443"

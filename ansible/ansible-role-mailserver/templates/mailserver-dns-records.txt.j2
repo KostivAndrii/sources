@@ -1,0 +1,18 @@
+; set up following dns records in order to be recognized as a legitimate mailserver
+{% for d in dkim_keys.results %}
+;;; {{ d.item.name }} ;;;
+
+{{ d.item.name }}                     IN  MX   10 {{ mailserver_hostname }}
+default._domainkey.{{ d.item.name }}  IN  TXT  v=DKIM1; k=rsa; s=email; {{ d.stdout }}
+_dmarc.{{ d.item.name }}              IN  TXT  v=DMARC1; p=none
+{% if 'address' in ansible_default_ipv6 %}
+{{ d.item.name }}                     IN  TXT  v=spf1 mx ip6:{{ ansible_default_ipv6.address }} -all
+{% else %}
+{{ d.item.name }}                     IN  TXT  v=spf1 mx -all
+{% endif %}
+
+{% endfor %}
+
+; don't forget to set PTR record for the address of the mail host
+; test your setup on sending an email to check-auth@verifier.port25.com or by
+; visiting https://www.mail-tester.com/

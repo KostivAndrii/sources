@@ -1,0 +1,9 @@
+---
+
+- name: install packages
+  yum : name={{ item }} state=present
+  with_items:
+    - avahi
+
+- name: start and enable service
+  service: name=avahi-daemon state=started enabled=yes

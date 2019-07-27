@@ -1,0 +1,124 @@
+---
+
+# httpd related
+
+#mediawiki_domain: wiki.example.org
+# uncomment to enable ssl vhost
+#mediawiki_ssl_listen: 14448
+
+#mediawiki_ssl_cert: "/etc/letsencrypt/live/{{ mediawiki_domain }}/cert.pem"
+#mediawiki_ssl_key: "/etc/letsencrypt/live/{{ mediawiki_domain }}/privkey.pem"
+#mediawiki_ssl_chain: "/etc/letsencrypt/live/{{ mediawiki_domain }}/chain.pem"
+
+devel_ssl_cert: /etc/pki/tls/certs/localhost.crt
+devel_ssl_key: /etc/pki/tls/private/localhost.key
+
+mediawiki_ssl_cert: "{{ devel_ssl_cert }}"
+mediawiki_ssl_key: "{{ devel_ssl_key }}"
+mediawiki_ssl_chain: "{{ devel_ssl_key }}"
+
+# --------------------
+# | mediawiki config |
+# --------------------
+
+mediawiki_install: true
+mediawiki_install_path: /var/www/mediawiki
+mediawiki_release: REL1_29
+mediawiki_user: apache
+mediawiki_site_name: MediaWiki
+mediawiki_meta_namespace: MediaWiki
+mediawiki_base_url: https://wiki.example.org
+mediawiki_domain: example
+mediawiki_logo_path: images/logo.jpg
+mediawiki_logo_source_file: none
+mediawiki_logo_copy_custom_file: false
+mediawiki_favicon_path: images/favicon.ico
+mediawiki_emergency_contact: admin@example.com
+mediawiki_password_sender: postmaster@example.com
+
+mediawiki_git_url_base: https://phabricator.wikimedia.org/diffusion/
+mediawiki_git_repo: MW/mediawiki.git
+
+# init
+mediawiki_name: empty_wiki
+mediawiki_admin_username: admin
+#mediawiki_admin_password: CHANGE_ME
+
+# caching
+mediawiki_cache_type: CACHE_NONE
+mediawiki_cache_memcached_servers: array()
+mediawiki_cache_memcached_sessions: true
+mediawiki_cache_directory: "{{ mediawiki_install_path }}/cache"
+
+# database
+mediawiki_db_host: localhost
+mediawiki_db_type: postgres
+mediawiki_db_server: localhost
+mediawiki_db_database: wikidb
+mediawiki_db_username: wikiuser
+#mediawiki_db_password: CHANGE_ME
+
+# paths
+mediawiki_script_path: ""
+mediawiki_article_path: "/$1"
+
+# lang
+mediawiki_language_code: en
+
+# uploads
+mediawiki_file_extensions: array( 'zip', 'tar', 'gz', 'pdf', 'svg' )
+mediawiki_allow_external_images: true
+
+# rights
+mediawiki_rights_page:
+mediawiki_rights_url:
+mediawiki_rights_text:
+mediawiki_rights_icon:
+
+# skins
+mediawiki_skins:
+    - name: "Vector"
+# XXX: comes with stock git repo
+#      url: "{{ mediawiki_git_url_base }}SVEC/vector.git"
+#      version: "{{ mediawiki_release }}"
+
+mediawiki_default_skin: Vector
+
+mediawiki_permissions:
+  groups:
+    - { group: "*", permission: "edit", allowed: "false" }
+    - { group: "*", permission: "createpage", allowed: "false" }
+    - { group: "*", permission: "createtalk", allowed: "false" }
+    - { group: "*", permission: "upload", allowed: "false" }
+    - { group: "*", permission: "reupload", allowed: "false" }
+    - { group: "*", permission: "reupload-shared", allowed: "false" }
+
+mediawiki_extensions:
+  - name: ParserFunctions
+#    url: "{{ mediawiki_git_url_base }}EPFN/extension-parserfunctions.git"
+    config: |
+      $wgPFEnableStringFunctions = true;
+
+  - name: ConfirmEdit
+#    url: "{{ mediawiki_git_url_base }}ECOE/extension-confirmedit.git"
+
+  - name: ConfirmEdit/QuestyCaptcha
+    config: |
+      $wgCaptchaClass = 'QuestyCaptcha';
+      $wgCaptchaTriggers['addurl']        = false;
+      $wgCaptchaTriggers['createaccount'] = true;
+      $wgCaptchaTriggers['badlogin']      = true;
+      $wgGroupPermissions['emailconfirmed']['skipcaptcha'] = true;
+      $wgAllowConfirmedEmail = true;
+      $arr = array (
+              "Question" => "Answer",
+      );
+      foreach ( $arr as $key => $value ) {
+              $wgCaptchaQuestions[] = array( 'question' => $key, 'answer' => $value );
+      }
+
+mediawiki_custom_lines:
+  - "# speed improvements"
+  - $wgUseGzip = true;
+
+mediawiki_debug: false

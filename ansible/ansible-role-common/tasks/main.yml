@@ -1,0 +1,26 @@
+- name: configure /etc/hosts
+  template:
+    src: etc-hosts.j2
+    dest: /etc/hosts
+  when: common_hostname_name is defined
+
+- name: configure /etc/resolv.conf
+  template:
+    src: etc-resolv.conf.j2
+    dest: /etc/resolv.conf
+  when: common_resolv_search is defined and common_resolv_nameservers is defined
+
+- name: set authorized keys for root user
+  authorized_key:
+    user: root
+    key: "{{ item }}"
+  with_file: "{{ common_ssh_keys }}"
+
+- name: allow cron for users
+  file: path=/etc/cron.deny state=absent
+
+- include: debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include: redhat.yml
+  when: ansible_os_family == 'RedHat'

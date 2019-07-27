@@ -1,0 +1,8 @@
+- name: install alias httpd config
+  template:
+    src=alias.j2
+    dest="/etc/httpd/conf.d/alias.conf"
+  notify: reload apache
+
+- file: path={{ item.dir }} owner=root group=root mode=755 state=directory
+  with_items: "{{ apache_aliases }}"

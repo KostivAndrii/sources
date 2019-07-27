@@ -1,0 +1,17 @@
+---
+
+- name: Install postgresql db packages
+  yum: name={{ item }} state=present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - postgresql-server
+    - python-psycopg2
+  notify:
+    - restart postgresql
+
+  # don't fail if python-passlib can't be installed
+  # e.g. if a RHEL server doesn't have access to EPEL repos
+- name: Install python-passlib if available
+  yum: name=python-passlib state=present
+  ignore_errors: True

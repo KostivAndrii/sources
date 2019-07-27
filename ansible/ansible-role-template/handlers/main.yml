@@ -1,0 +1,7 @@
+---
+
+- name: reload template
+  service: "name=template state=reloaded"
+
+- name: restart template
+  service: "name=template state=restarted"

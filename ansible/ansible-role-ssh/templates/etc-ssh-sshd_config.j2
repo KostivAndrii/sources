@@ -1,0 +1,41 @@
+#{{ ansible_managed }}
+Protocol 2
+SyslogFacility AUTHPRIV
+
+LoginGraceTime 2m
+PermitRootLogin without-password
+MaxAuthTries 6
+
+{% if ssh_ecdsa_hostkey_found %}
+HostKey {{ ssh_ecdsa_hostkey }}
+{% endif %}
+
+{% if ssh_rsa_hostkey_found %}
+HostKey {{ ssh_rsa_hostkey }}
+{% endif %}
+
+IgnoreRhosts yes
+PermitEmptyPasswords no
+PasswordAuthentication yes
+ChallengeResponseAuthentication no
+GSSAPIAuthentication no
+
+UsePAM yes
+
+X11Forwarding no
+PrintMotd yes
+
+TCPKeepAlive yes
+PrintLastLog yes
+
+#AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+#AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+#AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+#AcceptEnv XMODIFIERS
+
+{% if ansible_os_family == 'RedHat' or ansible_os_family == 'Generic' %}
+Subsystem sftp /usr/libexec/openssh/sftp-server
+{% endif %}
+{% if ansible_os_family == 'Debian' %}
+Subsystem sftp /usr/lib/openssh/sftp-server
+{% endif %}

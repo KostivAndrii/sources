@@ -1,0 +1,62 @@
+---
+
+- name: stop server
+  service: name=postgresql state=stopped
+  when: postgresql_reset_data
+
+- name: drop data directory
+  file: path={{ postgresql_data_directory }} state=absent
+  when: postgresql_reset_data
+
+- name: check whether Postgres is initialized
+  stat: path={{ postgresql_data_directory }}/PG_VERSION
+  register: pgdata_version
+
+- name: check /usr/bin/postgresql-setup existence
+  stat: path=/usr/bin/postgresql-setup
+  register: pgsetup_exists
+
+- name: initialize PostgreSQL database with postgresql-setup
+  command: /usr/bin/postgresql-setup initdb
+  when: pgdata_version.stat.exists == False and pgsetup_exists.stat.exists == True
+
+- name: initialize PostgreSQL database
+  command: /sbin/service postgresql initdb
+  when: pgdata_version.stat.exists == False and pgsetup_exists.stat.exists == False
+
+- name: install pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_hba_file }}"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+  notify:
+    - restart postgresql
+
+- name: install postgresql.conf
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ postgresql_config_file }}"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+  notify:
+    - restart postgresql
+
+- name: adjust kernel's shmmax value
+  shell: sysctl -w kernel.shmmax={{ postgresql_adjust_shm_value }}
+  when: postgresql_adjust_shm
+  changed_when: False
+
+- name: install /etc/sysctl.d/10-shmmax.conf
+  template:
+    src: 10-shmmax.conf.j2
+    dest: /etc/sysctl.d/10-shmmax.conf
+  when: postgresql_adjust_shm
+
+- name: restart if required
+  meta: flush_handlers
+
+- name: start and enable service
+  service: name=postgresql state=started enabled=yes

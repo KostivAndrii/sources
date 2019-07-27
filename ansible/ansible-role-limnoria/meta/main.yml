@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: Martin Milata <mmilata@srck.net>
+  description: Install supybot
+  license: WTFPL
+  min_ansible_version: 1.9
+  platforms:
+   - name: EL
+     versions:
+      - 7
+  categories:
+   - system

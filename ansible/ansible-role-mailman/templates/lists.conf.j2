@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+  ServerName {{ mailman_domain }}
+  Redirect permanent / https://{{ mailman_domain }}/
+</VirtualHost>
+
+Listen {{ mailman_ssl_listen }} ssl
+
+<VirtualHost *:{{ mailman_ssl_listen }}>
+  ServerName  {{ mailman_domain }}
+  SSLEngine on
+  SSLProtocol {{ apache_ssl_protocol }}
+  SSLCipherSuite {{ apache_ssl_cipher_suite }}
+
+  SSLCertificateFile {{ mailman_ssl_cert }}
+  SSLCertificateChainFile {{ mailman_ssl_chain }}
+  SSLCertificateKeyFile {{ mailman_ssl_key }}
+
+  Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains;"
+
+  ErrorLog logs/mailman_ssl_error_log
+  TransferLog logs/mailman_ssl_access_log
+  LogLevel warn
+
+  Include conf.d/mailman.conf
+</VirtualHost>

@@ -1,0 +1,10 @@
+{% for item in apache_aliases %}
+Alias {{ item.alias }} {{ item.dir }}
+
+<Directory "{{ item.dir }}">
+    Options Indexes
+    AllowOverride None
+    Require all granted
+</Directory>
+
+{% endfor %}

@@ -1,0 +1,125 @@
+---
+- name: Add Fedora infrastructure repository
+  copy: src=etc_yum.repos.d_fedora_infrastructure.repo dest=/etc/yum.repos.d/fedora_infrastructure.repo
+  tags:
+    - dependencies
+
+- name: install needed packages
+  yum: pkg={{ item }} state=present
+  with_items:
+  - gcc # required by python-pygit2
+  - redhat-rpm-config
+  - python-devel
+  - libgit2-devel
+  - pagure
+  - pagure-milters
+  - pagure-ev
+  - pagure-webhook
+  - python-psycopg2
+  - redis
+  - libsemanage-python
+  - mod_ssl
+  - python-fedora-flask # due to FAS (Fedora Account Services)
+  - stunnel
+
+- name: create all the directories where we store the git repos
+  file: state=directory
+               path={{ item }}
+               owner=git group=git mode=0775
+  with_items:
+  - "{{ pagure_datadir }}/repositories/"
+  - "{{ pagure_datadir }}/repositories/forks"
+  - "{{ pagure_datadir }}/repositories/docs"
+  - "{{ pagure_datadir }}/repositories/tickets"
+  - "{{ pagure_datadir }}/repositories/requests"
+  - "{{ pagure_datadir }}/remotes"
+
+- name: create the tmp folder where to clone repos
+  file: state=directory
+               path="{{ pagure_datadir }}/tmp"
+               owner=git group=git mode=0775
+
+- include: milter.yml
+#- include: stunnel.yml
+
+# Set-up Pagure
+
+- name: create the /var/www/releases folder
+  file: state=directory
+               path=/var/www/releases
+               owner=git group=git mode=0775
+
+- name: copy sundry pagure configuration
+  template: src={{ item.file }}
+            dest={{ item.dest }}
+            owner=git group=postfix mode=0640
+  with_items:
+  - { file: pagure.cfg.j2, dest: /etc/pagure/pagure.cfg }
+  - { file: alembic.ini.j2, dest: /etc/pagure/alembic.ini }
+  notify:
+  - restart apache
+
+- name: create the database scheme
+  command: /usr/bin/python2 /usr/share/pagure/pagure_createdb.py
+  changed_when: "1 != 1"
+  environment:
+      PAGURE_CONFIG: /etc/pagure/pagure.cfg
+
+- name: install ssl httpd config
+  template: src=pagure.conf.j2 dest=/etc/httpd/conf.d/pagure.conf
+            owner=root group=root mode=0644
+  notify:
+  - reload apache
+
+- name: Install the wsgi file
+  template: src={{ item }}
+            dest=/var/www/{{ item }}
+            owner=git group=git mode=0644
+  with_items:
+  - pagure.wsgi
+  - docs_pagure.wsgi
+  notify:
+  - restart apache
+
+- name: Add default facl so apache can read git repos
+  acl: default=yes etype=user entity=apache permissions="rx" name={{ pagure_datadir }} state=present
+  register: acl_updates
+  when: common_selinux
+
+- name: Manually fix current default ACLs since Ansible doesnt know recursive acls
+  command: /usr/bin/setfacl -Rdm user:apache:rx {{ pagure_datadir }}
+  when: common_selinux and acl_updates.changed
+
+- name: Manually fix current ACLs since Ansible doesnt know recursive acls
+  command: /usr/bin/setfacl -Rm user:apache:rx {{ pagure_datadir }}
+  when: common_selinux and acl_updates.changed
+
+- name: set sebooleans so pagure can talk to the db
+  seboolean: name=httpd_can_network_connect_db
+                    state=true
+                    persistent=true
+  when: common_selinux
+
+- name: set sebooleans so apache can send emails
+  seboolean: name=httpd_can_sendmail
+                    state=true
+                    persistent=true
+  when: common_selinux
+
+- seport:
+    ports: "{{ pagure_ssl_listen }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  when: common_selinux
+
+- name: Start and enable httpd, postfix, pagure_milter
+  service: name={{ item }} enabled=yes state=started
+  with_items:
+  - httpd
+  - postfix
+    #  - stunnel
+  - pagure_milter
+  - redis
+  - pagure_ev
+  - pagure_webhook

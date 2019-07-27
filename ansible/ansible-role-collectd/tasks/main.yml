@@ -1,0 +1,81 @@
+---
+# collectd client setup
+
+# install pkg
+- name: install collectd
+  yum: name=collectd state=present
+  when: ansible_distribution_major_version != '6'
+
+# FIXME: requires custom repo
+- name: install collectd
+  yum: name=collectd5 state=present
+  when: ansible_distribution_major_version == '6'
+
+# enable collectd
+- name: enable collectd svc
+  service: state=running enabled=true name=collectd
+
+# install collected.conf
+- name: /etc/collectd.conf
+  template: src=collectd.conf.j2 dest=/etc/collectd.conf
+  notify:
+  - restart collectd
+
+# install collectd-network config
+- name: /etc/collectd.d/network.conf
+  template: src=network-client.conf.j2 dest=/etc/collectd.d/network.conf
+  notify:
+  - restart collectd
+  when: collectd_network and not inventory_hostname.startswith('log')
+
+- shell: setsebool -P collectd_tcp_network_connect 1
+  when: common_selinux
+
+# install collectd-network config
+- name: /etc/collectd.d/network.conf
+  copy: src=network-server.conf dest=/etc/collectd.d/network.conf
+  notify:
+  - restart collectd
+  when: inventory_hostname.startswith('log')
+
+# apache - localhost only - pretty much any apache server
+- name: install collectd-apache
+  yum: state=present name=collectd-apache
+  notify:
+  - restart collectd
+  when: collectd_apache and ansible_distribution_major_version|int < 22
+
+- name: /etc/collectd.d/apache.conf
+  copy: src=apache.conf dest=/etc/collectd.d/apache.conf
+  notify:
+  - restart collectd
+  when: collectd_apache
+
+- name: /etc/collectd.d/chains.conf
+  template: src=chains.conf dest=/etc/collectd.d/chains.conf
+  notify:
+  - restart collectd
+
+- name: /etc/collectd.d/graphite.conf
+  template: src=graphite.conf dest=/etc/collectd.d/graphite.conf
+  notify:
+  - restart collectd
+  when: collectd_graphite
+
+- name: /etc/collectd.d/thermal.conf
+  template: src=thermal.conf dest=/etc/collectd.d/thermal.conf
+  notify:
+  - restart collectd
+  when: collectd_physhw
+
+- name: /etc/collectd.d/cpufreq.conf
+  template: src=cpufreq.conf dest=/etc/collectd.d/cpufreq.conf
+  notify:
+  - restart collectd
+  when: collectd_physhw
+
+- name: enable collectd nfs module
+  copy: src=nfs.conf dest=/etc/collectd.d/nfs.conf
+  notify:
+  - restart collectd
+  when: collectd_nfs

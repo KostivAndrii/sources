@@ -1,0 +1,19 @@
+---
+- name: install gitolite packages
+  yum : name={{ item }} state=installed
+  with_items:
+  - gitolite3
+
+- name: install gitolite config
+  template:
+    src=gitolite.rc.j2
+    dest={{ gitolite_repo }}/.gitolite.rc
+    mode=0640
+    owner=git
+    group=git
+
+- stat: path={{ gitolite_repo }}/.gitolite/keydir/admin.pub
+  register: admin_key
+
+- include: initial.yml
+  when: not admin_key.stat.exists

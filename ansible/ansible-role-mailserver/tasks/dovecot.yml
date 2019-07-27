@@ -1,0 +1,63 @@
+- name: Install Dovecot and related packages
+  yum: name={{ item }} state=present
+  with_items:
+    - dovecot
+    - dovecot-pgsql
+    - dovecot-pigeonhole
+  tags:
+    - dependencies
+
+- name: Enable and start Dovecot
+  service: name=dovecot state=started enabled=yes
+
+- name: Create vmail group
+  group: name=vmail state=present gid=5000
+
+- name: Create vmail user
+  user: name=vmail group=vmail state=present uid=5000 home={{ mailserver_data_dir }} shell=/usr/sbin/nologin
+
+- name: Ensure mail domain directories are in place
+  file: state=directory path={{ mailserver_data_dir }}/{{ item.name }} owner=vmail group=dovecot mode=770
+  with_items: "{{ mailserver_domains }}"
+
+- name: Ensure mail directories are in place
+  file: state=directory path={{ mailserver_data_dir }}/{{ item.domain }}/{{ item.account }} owner=vmail group=dovecot
+  with_items: "{{ mailserver_users }}"
+
+- name: Copy dovecot.conf into place
+  copy: src=etc_dovecot_dovecot.conf dest=/etc/dovecot/dovecot.conf
+
+- name: Copy additional Dovecot configuration files in place
+  copy: src=etc_dovecot_conf.d_{{ item }} dest=/etc/dovecot/conf.d/{{ item }}
+  with_items:
+    - 10-auth.conf
+    - 10-master.conf
+  notify: restart dovecot
+
+- name: Template additional Dovecot configuration files
+  template: src=etc_dovecot_conf.d_{{ item }}.j2 dest=/etc/dovecot/conf.d/{{ item }}
+  with_items:
+    - auth-sql.conf.ext
+    - 10-mail.conf
+    - 10-ssl.conf
+    - 15-lda.conf
+    - 90-sieve.conf
+  notify: restart dovecot
+
+- name: Template dovecot-sql.conf.ext
+  template: src=etc_dovecot_dovecot-sql.conf.ext.j2 dest=/etc/dovecot/dovecot-sql.conf.ext
+  notify: restart dovecot
+
+- name: Ensure correct permissions on Dovecot config directory
+  file: state=directory path=/etc/dovecot
+          group=dovecot owner=vmail mode=770 recurse=yes
+  notify: restart dovecot
+
+- name: Allow POP3S/IMAPS in firewalld
+  firewalld: service={{ item }} state=enabled permanent=yes immediate=yes
+  with_items:
+    - pop3s
+    - imaps
+  tags:
+    - firewalld
+  when: common_firewalld

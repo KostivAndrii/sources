@@ -1,0 +1,4 @@
+#{{ ansible_managed }}
+#!/bin/sh
+source scl_source enable php{{ composer_php_scl_version }}
+exec php {{ composer_install_path}}/composer.phar "$@"

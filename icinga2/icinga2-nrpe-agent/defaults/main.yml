@@ -1,0 +1,35 @@
+---
+# defaults file for icinga2-nrpe-agent
+
+nrpe_agent_RedHat:
+ - nrpe
+ - nagios-plugins-all
+ - nrpe-selinux
+
+nrpe_agent_Debian:
+ - nagios-nrpe-server
+ - nagios-nrpe-plugin
+ - nagios-plugins
+
+nrpe_agent_Gentoo:
+ - nrpe
+ - nagios-plugins
+
+nrpe_agent_config: "/etc/nagios/nrpe.cfg"
+
+# A list of allowed hosts for Nrpe agent
+nrpe_allowed_hosts: "127.0.0.1,192.168.0.1"
+
+# Plugins path for RH and other x86_64
+nrpe_agent_plugins_path: "/usr/lib64/nagios/plugins"
+
+nrpe_agent_check_mem: "https://raw.githubusercontent.com/zwindler/check_mem_ng/master/check_mem_ng.sh"
+
+ssh_port: 22
+
+# Sample NRPE check commands
+nrpe_check_commands:
+  check_load:
+    check_load: "-w 15,10,5 -c 30,25,20"
+  check_disk:
+    check_disk: "-w 20% -c 10% -p /"

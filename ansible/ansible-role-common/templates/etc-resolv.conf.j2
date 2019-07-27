@@ -1,0 +1,4 @@
+search {{ common_resolv_search }}
+{% for ns in common_resolv_nameservers %}
+nameserver {{ ns }}
+{% endfor %}

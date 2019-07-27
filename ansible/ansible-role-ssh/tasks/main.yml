@@ -1,0 +1,28 @@
+---
+
+- set_fact:
+    ssh_ecdsa_hostkey_found: False
+    ssh_rsa_hostkey_found: False
+
+- stat: path="{{ ssh_ecdsa_hostkey }}"
+  register: ecdsa_key_stat
+
+- set_fact:
+    ssh_ecdsa_hostkey_found: True
+  when: "{{ ecdsa_key_stat.stat.exists }}"
+
+- stat: path="{{ ssh_rsa_hostkey }}"
+  register: rsa_key_stat
+
+- set_fact:
+    ssh_rsa_hostkey_found: True
+  when: "{{ rsa_key_stat.stat.exists }}"
+
+- name: sshd configuration file update
+  template: src=etc-ssh-sshd_config.j2
+    dest=/etc/ssh/sshd_config
+    backup=yes
+    owner=0 group=0 mode=0644
+    validate='/usr/sbin/sshd -T -f %s'
+  notify:
+  - restart sshd

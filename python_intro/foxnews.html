@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>The Twelve-Factor App (Русский перевод)</title>
+  <meta name="description" content="A methodology for building modern, scalable, maintainable software-as-a-service apps.">
+  <meta name="author" content="Adam Wiggins">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="images/favicon.ico">
+
+  <link rel="stylesheet" href="/css/screen.css" media="screen">
+  <link rel="stylesheet" href="/css/mobile.css" media="screen">
+
+  <script type="text/javascript" src="//use.typekit.com/rsq7tro.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+</head>
+<body>
+  
+  <!-- Google Tag Manager -->
+  <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-TK5QTP"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-TK5QTP');</script>
+  <!-- End Google Tag Manager -->
+  
+
+  <header>
+    <h1><a href="./" title="The Twelve-Factor App">The Twelve-Factor App</a></h1>
+  </header>
+
+  <section class="abstract" id="factor">
+  <article>
+    
+<h2 id="iii_">III. Конфигурация</h2>
+
+<h3 id="____">Сохраняйте конфигурацию в среде выполнения</h3>
+
+<p><em>Конфигурация</em> приложения – это всё, что может меняться между <a href="./codebase">развёртываниями</a> (среда разработки, промежуточное и рабочее развёртывание). Это включает в себя:</p>
+
+<ul>
+<li>Идентификаторы подключения к ресурсам типа базы данных, кэш-памяти и другим <a href="./backing-services">сторонним службам</a></li>
+
+<li>Регистрационные данные для подключения к внешним сервисам, например, к Amazon S3 или Twitter</li>
+
+<li>Значения зависимые от среды развёртывания такие, как каноническое имя хоста</li>
+</ul>
+
+<p>Иногда приложения хранят конфигурации как константы в коде. Это нарушение методологии двенадцати факторов, которая требует <strong>строгого разделения конфигурации и кода</strong>. Конфигурация может существенно различаться между развёртываниями, код не должен различаться.</p>
+
+<p>Лакмусовой бумажкой того, правильно ли разделены конфигурация и код приложения, является факт того, что кодовая база приложения может быть в любой момент открыта в свободный доступ без компрометации каких-либо приватных данных.</p>
+
+<p>Обратите внимание, что это определение “конфигурации” <strong>не</strong> включает внутренние конфигурации приложения, например такие как ‘config/routes.rb’ в Rails, или того как <a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/beans.html">основные модули будут связаны</a> в <a href="http://spring.io/">Spring</a>. Этот тип конфигурации не меняется между развёртываниями и поэтому лучше всего держать его в коде.</p>
+
+<p>Другим подходом к конфигурации является использование конфигурационных файлов, которые не сохраняются в систему контроля версия, например ‘config/database.yml’ в Rails. Это огромное улучшение перед использованием констант, которые сохраняются в коде, но по-прежнему и у этого метода есть недостатки: легко по ошибке сохранить конфигурационный файл в репозиторий; существует тенденция когда конфигурационные файлы разбросаны в разных местах и в разных форматах, из за этого становится трудно просматривать и управлять всеми настройками в одном месте. Кроме того форматы этих файлов, как правило, специфичны для конкретного языка или фреймворка.</p>
+
+<p><strong>Приложение двенадцати факторов хранит конфигурацию в <em>переменных окружения</em></strong> (часто сокращается до <em>env vars</em> или <em>env</em>). Переменные окружения легко изменить между развёртываниями, не изменяя код; в отличие от файлов конфигурации, менее вероятно случайно сохранить их в репозиторий кода; и в отличие от пользовательских конфигурационных файлов или других механизмов конфигурации, таких как Java System Properties, они являются независимым от языка и операционной системы стандартом.</p>
+
+<p>Другим подходом к управлению конфигурациями является группировка. Иногда приложения группируют конфигурации в именованные группы (часто называемые “окружениями”) названые по названию конкретного развёртывания, например как <code>development</code>, <code>test</code> и <code>production</code> окружения в Rails. Этот метод не является достаточно масштабируемым: чем больше различных развёртываний приложения создаётся, тем больше новых имён окружений необходимо, например <code>staging</code> и <code>qa</code>. При дальнейшем росте проекта, разработчики могут добавлять свои собственные специальные окружения, такие как <code>joes-staging</code>, в результате происходит комбинаторный взрыв конфигураций, который делает управление развёртываниями приложения очень хрупким.</p>
+
+<p>В приложении двенадцати факторов переменные окружения являются не связанными между собой средствами управления, где каждая переменная окружения полностью независима от других. Они никогда не группируются вместе в “окружения”, а вместо этого управляются независимо для каждого развёртывания. Эта модель которая масштабируется постепенно вместе с естественным появлением большего количества развёртываний приложения за время его жизни.</p>
+
+  </article>
+</section>
+
+<section class="concrete">
+  <nav>
+    <div id="locales"><a href="/zh_cn/config">简体中文 (zh_cn)</a> | <a href="/th/config">ภาษาไทย (th)</a> | <a href="/ja/config">日本語 (ja)</a> | <a href="/fr/config">Français (fr)</a> | <a href="/tr/config">Turkish (tr)</a> | <a href="/es/config">Español (es)</a> | <span>Русский (ru)</span> | <a href="/ko/config">한국어 (ko)</a> | <a href="/pt_br/config">Brazilian Portuguese (pt_br)</a> | <a href="/it/config">Italiano (it)</a> | <a href="/config">English (en)</a> | <a href="/de/config">Deutsch (de)</a> | <a href="/uk/config">Українська (uk)</a> | <a href="/pl/config">Polski (pl)</a></div>
+    <div id="prev"><a href="./dependencies">&laquo; Previous</a></div>
+    <div id="next"><a href="./backing-services">Next &raquo;</a></div>
+  </nav>
+</section>
+
+
+  <footer>
+  <div id="locales"><a href="/zh_cn/config">简体中文 (zh_cn)</a> | <a href="/th/config">ภาษาไทย (th)</a> | <a href="/ja/config">日本語 (ja)</a> | <a href="/fr/config">Français (fr)</a> | <a href="/tr/config">Turkish (tr)</a> | <a href="/es/config">Español (es)</a> | <span>Русский (ru)</span> | <a href="/ko/config">한국어 (ko)</a> | <a href="/pt_br/config">Brazilian Portuguese (pt_br)</a> | <a href="/it/config">Italiano (it)</a> | <a href="/config">English (en)</a> | <a href="/de/config">Deutsch (de)</a> | <a href="/uk/config">Українська (uk)</a> | <a href="/pl/config">Polski (pl)</a></div>
+  <div>Written by Adam Wiggins</div>
+  <div>Last updated 2017</div>
+  <div><a href="https://github.com/heroku/12factor">Sourcecode</a></div>
+  <div><a href="/12factor.epub">Download ePub Book</a></div>
+  <div><a href="https://www.heroku.com/policy/privacy">Privacy Policy</a></div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,67 @@
+---
+- name: add COPR repo for python-django-tagging
+  copy:
+    src: rmarko-django-tagging.repo
+    dest: /etc/yum.repos.d/rmarko-django-tagging-epel-7.repo
+  when: ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
+
+- name: install needed packages
+  yum: pkg={{ item }} state=present
+  with_items:
+  - graphite-web
+  - python-carbon
+  - libsemanage-python
+  - mod_ssl
+
+- seport:
+    ports: "{{ graphite_ssl_listen }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  when: common_selinux
+
+- name: graphite-web config file
+  template: src=local_settings.py dest=/etc/graphite-web/local_settings.py owner=root group=root mode=644
+  notify:
+  - restart httpd
+
+- name: create data directory
+  file:
+    path: /etc/httpd/conf.d/graphite/
+    state: directory
+
+- name: graphite-web apache config
+  template: src=graphite-web.conf dest=/etc/httpd/conf.d/graphite/graphite-web.conf owner=root group=root mode=644
+  notify:
+  - restart httpd
+
+- name: graphite-web apache ssl config
+  template: src=graphite-ssl.conf dest=/etc/httpd/conf.d/graphite-ssl.conf owner=root group=root mode=644
+  when: graphite_ssl_listen is defined
+  notify:
+  - restart httpd
+
+- name: carbon config file
+  template: src=carbon.conf.j2 dest=/etc/carbon/carbon.conf owner=root group=root mode=644
+  notify:
+  - restart carbon-cache
+
+- name: carbon storage schemas
+  template: src=storage-schemas.conf.j2 dest=/etc/carbon/storage-schemas.conf owner=root group=root mode=644
+  when: graphite_manage_storage_schemas
+
+- name: set carbon-cache to run on boot
+  service: name=carbon-cache enabled=yes state=running
+
+- name: initialize graphite-web database
+  command: /usr/bin/graphite-manage syncdb --noinput
+  args:
+    creates: /var/lib/graphite-web/graphite.db
+
+- name: build graphite  index
+  command: /usr/bin/graphite-build-index
+  args:
+    creates: /var/lib/graphite-web/index
+
+- name: chown the sqlite database to apache.apache
+  file: path=/var/lib/graphite-web/ owner=apache group=apache recurse=yes

@@ -1,0 +1,79 @@
+---
+- name: Centos Install Centos Release Scl
+  package:
+    name: centos-release-scl
+    state: present
+  when: ansible_distribution == "CentOS"
+
+- name: RedHat Install RhScl subscription requirment
+  fail:
+    msg: "please enable subscription-manager repos --enable rhel-server-rhscl-{{ ansible_facts.ansible_distribution_major_version }}-rpms"
+  when: ansible_distribution == "RedHat"
+
+- name: Install Mysql php-fpm
+  package:
+    name: rh-php71-php-mysqlnd
+    state: present
+
+- name: Find out timezone
+  slurp:
+     src: /etc/localtime
+  register: etc_localtime
+
+- name: Timezone in php.ini
+  lineinfile:
+    path: /etc/opt/rh/rh-php71/php.ini
+    regexp: '^;?date.timezone ='
+    line: 'date.timezone = "{{ etc_localtime["content"] | b64decode | regex_replace("\n") }}"'
+
+- name: Install Icinga Web2 on RedHat OS family
+  yum:
+    name: "{{ icinga2_web2_ui_rpm }}"
+    state: latest
+    enablerepo: "{{ enablerepo }}"
+  tags: icinga2-ansible-web2-ui-install
+  when: ansible_pkg_mgr == "yum"
+
+- name: Install Icinga Web2 on RedHat OS family
+  dnf:
+    name: "{{ icinga2_web2_ui_rpm }}"
+    state: latest
+    enablerepo: "{{ enablerepo }}"
+  tags: icinga2-ansible-web2-ui-install
+  when: ansible_pkg_mgr == "dnf"
+
+- name: Install the Icinga2 IDO module
+  package:
+    name: icinga2-ido-mysql
+    state: present
+    priv: "{{ icinga2_web2_db }}.*:ALL"
+
+- import_tasks: icinga2_web2_create_databases.yml
+
+- name: Define web server daemon package.
+  set_fact:
+    web_server_daemon: "{{ __web_server_daemon_rh }}"
+  when: web_server_daemon is not defined
+
+- name: Restart {{ web_server_daemon }} and Icinga2 to Apply the Configuration
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop:
+    - "{{ web_server_daemon }}"
+    - icinga2
+    - php-fpm
+  when: ansible_pkg_mgr == "dnf"
+
+- name: Restart {{ web_server_daemon }} and Icinga2 to Apply the Configuration
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop:
+    - "{{ web_server_daemon }}"
+    - icinga2
+    - rh-php71-php-fpm
+  when:
+    - ansible_pkg_mgr == "yum"

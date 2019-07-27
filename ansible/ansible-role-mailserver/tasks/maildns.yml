@@ -1,0 +1,19 @@
+---
+- name: read DKIM keys
+  shell: 'grep -o p=[^\"]* /etc/opendkim/keys/{{ item.name }}/default.txt'
+  register: dkim_keys
+  with_items: "{{ mailserver_domains }}"
+  tags:
+  - maildns
+
+- name: write DNS records to file
+  template:
+    src: mailserver-dns-records.txt.j2
+    dest: /root/mailserver-dns-records.txt
+  tags:
+  - maildns
+
+- debug:
+    msg: Instructions for setting up DNS records have been written to /root/mailserver-dns-records.txt
+  tags:
+  - maildns

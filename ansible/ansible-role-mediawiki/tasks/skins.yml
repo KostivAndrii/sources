@@ -1,0 +1,9 @@
+---
+
+- name: check out skins from git
+  git:
+    repo={{ item.url }}
+    dest={{ mediawiki_install_path }}/skins/{{ item.name }}
+    version={{ item.version }}
+  with_items: "{{ mediawiki_skins }}"
+  when: item.url is defined

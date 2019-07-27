@@ -1,0 +1,12 @@
+---
+
+- name: copy ssh key to remote host
+  copy: src={{ gitolite_admin_key }} dest=/tmp/admin.pub owner=git group=git
+
+- name: set-up gitolite with pub key
+  shell: gitolite setup -pk /tmp/admin.pub
+  sudo: yes
+  sudo_user: git
+
+- name: delete temporary ssh key
+  file: path=/tmp/admin.pub state=absent

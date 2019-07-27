@@ -1,0 +1,4 @@
+---
+
+gitolite_repo: /srv/git
+#gitolite_admin_key: (required)

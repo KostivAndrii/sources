@@ -1,0 +1,21 @@
+---
+
+- name: Lookup OS specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- include: install.yml
+- include: conf.yml
+
+- name: include ssl config
+  include: ssl.yml
+  when: apache_ssl
+
+- name: include alias config
+  include: alias.yml
+  when: apache_aliases
+
+- name: include selinux config
+  include: selinux.yml
+  when: common_selinux
+
+- include: service.yml

@@ -1,0 +1,42 @@
+- name: Add COPR repositroy with dovecot-antispam
+  copy: src=etc_yum.repos.d_mmilata-dovecot-antispam.repo dest=/etc/yum.repos.d/mmilata-dovecot-antispam.repo
+  tags:
+    - dependencies
+
+- name: Install dspam and related packages
+  yum: name={{ item }} state=present enablerepo=mmilata-dovecot-antispam
+  with_items:
+    - dspam
+    - dspam-hash
+    - dspam-pgsql
+    - dovecot-antispam
+  tags:
+    - dependencies
+
+- name: Add dspam to the vmail group
+  user: name=dspam groups=vmail append=yes
+
+- name: Make data dir accessible to dspam
+  file: state=directory path={{ mailserver_data_dir }} owner=vmail group=dspam mode=710
+
+- name: Create dspam directory
+  file: state=directory path={{ mailserver_data_dir }}/dspam group=dspam owner=dspam
+
+- name: Put dspam configuration files in place
+  template: src=etc_dspam.conf.j2 dest=/etc/dspam.conf owner=dspam group=dspam mode=644
+  notify: restart dspam
+
+- name: Put dspam postfix configuration in place
+  copy: src=etc_postfix_dspam_filter_access dest=/etc/postfix/dspam_filter_access owner=root group=root
+  notify: restart postfix
+
+- name: Put dspam dovecot configuration in place
+  copy: src=etc_dovecot_conf.d_90-plugin.conf dest=/etc/dovecot/conf.d/90-plugin.conf owner=vmail group=dovecot
+  notify: restart dovecot
+
+- name: Put more dspam dovecot configuration in place
+  template: src=etc_dovecot_conf.d_20-imap.conf.j2 dest=/etc/dovecot/conf.d/20-imap.conf owner=vmail group=dovecot
+  notify: restart dovecot
+
+- name: Enable and start dspam
+  service: name=dspam state=started enabled=yes

@@ -1,0 +1,7 @@
+---
+
+- name: reload sniproxy
+  service: "name=sniproxy state=reloaded"
+
+- name: restart sniproxy
+  service: "name=sniproxy state=restarted"

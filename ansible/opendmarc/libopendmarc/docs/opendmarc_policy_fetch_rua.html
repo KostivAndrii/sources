@@ -1,0 +1,92 @@
+<html>
+<head><title>opendmarc_policy_fetch_rua()</title></head>
+<body>
+<!--
+$Id: opendmarc_policy_fetch_rua.html,v 1.5 2010/07/24 04:52:15 cm-msk Exp $
+-->
+<h1>opendmarc_policy_fetch_rua()</h1>
+<p align="right"><a href="index.html">[back to index]</a></p>
+
+<table border="0" cellspacing=4 cellpadding=4>
+<!---------- Synopsis ----------->
+<tr><th valign="top" align=left width=150>SYNOPSIS</th><td>
+<pre>
+#include &lt;dmarc.h&gt;
+u_char ** opendmarc_policy_fetch_rua(
+	<a href="dmarc_policy_t.html"><tt>DMARC_POLICY_T</tt></a> *pctx,
+	u_char *list_buf, size_t size_of_buf, int constant
+);
+</pre>
+Query the library to find the list of <tt>rua=</tt> values from the <tt>DMARC</tt> record.
+</td></tr>
+
+<!----------- Description ---------->
+<tr><th valign="top" align=left>DESCRIPTION</th><td>
+<table border="1" cellspacing=1 cellpadding=4>
+<tr align="left" valign=top>
+<th width="80">Called When</th>
+<td><tt>opendmarc_policy_fetch_rua()</tt>
+	is called after the DMARC record has been fetched and parsed.
+</tr>
+</table>
+
+<!----------- Arguments ---------->
+<tr><th valign="top" align=left>ARGUMENTS</th><td>
+    <table border="1" cellspacing=0>
+    <tr bgcolor="#dddddd"><th>Argument</th><th>Description</th></tr>
+    <tr valign="top"><td>pctx</td>
+	<td>The address of a structure of type <a href="dmarc_policy_t.html">
+        <tt>DMARC_POLICY_T</tt></a> as returned from <a href="opendmarc_policy_connect_init.html">opendmarc_policy_connect_init()</a>. 
+	</td></tr>
+    <tr valign="top"><td>list_buf</td>
+	<td>If not NULL, the address of a buffer to receive a comma delimited list as a single string.
+	</td></tr>
+    <tr valign="top"><td>size_of_buf</td>
+	<td>If <tt>list_buf</tt> was not NULL, the the length of that buffer in bytes.
+	</td></tr>
+    <tr valign="top"><td>constant</td>
+	<td>This function returns an argv-style array of stings. Set this to 0 if you will free that array
+	    when you are finished with it. Set this to 1 if you want to treat that array as const and have
+	    the library magically free it for you.
+	</td></tr>
+    </table>
+</td></tr>
+
+<!----------- Return Values ---------->
+<tr>
+<th valign="top" align=left>RETURN VALUES</th> 
+<td>
+<ul>
+<li><tt>!= NULL</tt> -- On success.
+<li><tt>NULL</tt> -- The <tt>pctp</tt> pointer was NULL.
+<li><tt>NULL</tt> -- If the <tt>DMARC</tt> record contained no <tt>rua=</tt>
+</ul>
+</td>
+</tr>
+
+<!----------- Notes ---------->
+<tr>
+<th valign="top" align=left>NOTES</th> 
+<td>
+<ul>
+<li>If you set <tt>constant</tt> to 1, you must not free the array returned. To do so will have unpredictable results.
+<li>Call this function only after a <tt>DMARC</tt> record was fetched and parsed with
+<a href="opendmarc_policy_query_dmarc.html">opendmarc_policy_query_dmarc()</a>
+or supplied to the library with
+<a href="opendmarc_policy_store_dmarc.html">opendmarc_policy_store_dmarc()</a>.
+<li>Note that each returned record is looked up using DNS to find if it is accepting reports for the from_domain. If not, it is eliminated from the returned list.
+</ul>
+</td>
+</tr>
+</table>
+
+<hr size="1">
+<font size="-1">
+Copyright (c) 2012, The Trusted Domain Project.  All rights reserved.
+
+<br>
+By using this file, you agree to the terms and conditions set
+forth in the license.
+</font>
+</body>
+</html>

@@ -1,0 +1,13 @@
+THOUGHTS
+TODO
+.deps
+.libs
+Makefile
+Makefile.in
+libopendmarc.la
+libopendmarc.a
+libtool
+tags
+*.o
+*.lo
+core
